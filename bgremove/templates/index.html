@@ -1,0 +1,350 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block title %}Inicio - CroPix{% endblock %}
+
+{% block content %}
+
+    <!-- Header -->
+    <header id="header" class="header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-xl-5">
+                    <div class="text-container">
+                        <h1 class="h1-large">Quita el fondo de tus imágenes con Inteligencia Artificial</h1>
+                        <p class="p-large">CroPix es una herramienta gratuita que utiliza IA avanzada para eliminar el fondo de tus fotos en segundos. Sube tu imagen y obtén resultados profesionales sin esfuerzo.</p>
+                        <a class="btn-solid-lg" href="/remove">Probar gratis</a>
+                            <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'C0C01JV8BC');kofiwidget2.draw();</script> 
+                    </div> <!-- end of text-container -->
+                </div> <!-- end of col -->
+                <div class="col-lg-6 col-xl-7">
+                    <div class="image-container">
+                        <img class="img-fluid" src="{% static 'images/header-image.png' %}" alt="Quitar fondo IA">
+                    </div> <!-- end of image-container -->
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </header> <!-- end of header -->
+    <!-- end of header -->
+
+
+    <!-- Services -->
+    <div id="services" class="cards-1 bg-gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>¿Qué puedes hacer con CroPix?</h2>
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+            <div class="row">
+                <div class="col-lg-12">
+                    
+                    <!-- Card -->
+                    <div class="card">
+                        <div class="card-icon">
+                            <span class="fas fa-magic"></span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">Elimina fondos automáticamente</h5>
+                            <p>La IA detecta el sujeto principal y elimina el fondo de forma precisa, sin necesidad de conocimientos técnicos.</p>
+                            <a class="read-more no-line" href="/remove">Usar IA <span class="fas fa-long-arrow-alt-right"></span></a>
+                        </div>
+                    </div>
+                    <!-- end of card -->
+
+                    <!-- Card -->
+                    <div class="card">
+                        <div class="card-icon red">
+                            <span class="fas fa-bolt"></span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">Resultados instantáneos y gratuitos</h5>
+                            <p>Procesa tus imágenes en segundos y descárgalas gratis en formato PNG, WebP o SVG con transparencia.</p>
+                            <a class="read-more no-line" href="/remove">Usar gratis <span class="fas fa-long-arrow-alt-right"></span></a>
+                        </div>
+                    </div>
+                    <!-- end of card -->
+
+                    <!-- Card -->
+                    <div class="card">
+                        <div class="card-icon green">
+                            <span class="fas fa-user-astronaut"></span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">Ideal para e-commerce, diseño y redes</h5>
+                            <p>Optimiza fotos de productos, retratos y contenido visual para tiendas online, presentaciones y redes sociales.</p>
+                            <a class="read-more no-line" href="#header">Ver ejemplos <span class="fas fa-long-arrow-alt-right"></span></a>
+                        </div>
+                    </div>
+                    <!-- end of card -->
+
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </div> <!-- end of cards-1 -->
+    <!-- end of services -->
+
+
+    <!-- Details 1 -->
+    <div id="details" class="basic-1">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-xl-7">
+                    <div class="image-container">
+                        <img class="img-fluid" src="{% static 'images/details-1.png' %}" alt="Ejemplo IA fondo quitado">
+                    </div> <!-- end of image-container -->
+                </div> <!-- end of col -->
+                <div class="col-lg-6 col-xl-5">
+                    <div class="text-container">
+                        <div class="section-title">¿Cómo funciona?</div>
+                        <h2>La IA detecta el sujeto y elimina el fondo</h2>
+                        <p>Solo sube tu imagen, la inteligencia artificial de CroPix identifica automáticamente el sujeto principal y elimina el fondo, manteniendo la calidad y los detalles.</p>
+                        <a class="btn-solid-reg" href="/remove">Empieza gratis</a>
+                    </div> <!-- end of text-container -->
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </div> <!-- end of basic-1 -->
+    <!-- end of details 1 -->
+
+
+    <!-- Details 2 -->
+    <div class="basic-2">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-xl-5">
+                    <div class="text-container">
+                        <div class="section-title">100% gratuito</div>
+                        <h2>Sin registros ni pagos</h2>
+                        <p>Usa CroPix todas las veces que quieras, sin límites ni costos ocultos. No necesitas crear una cuenta ni dar datos personales.</p>
+                        <a class="btn-outline-reg" href="/remove">Quitar fondo ahora</a>
+                    </div> <!-- end of text-container -->
+                </div> <!-- end of col -->
+                <div class="col-lg-6 col-xl-7">
+                    <div class="image-container">
+                        <img class="img-fluid" src="{% static 'images/details-2.png' %}" alt="IA gratis">
+                    </div> <!-- end of image-container -->
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </div> <!-- end of basic-2 -->
+    <!-- end of details 2 -->
+
+
+    <!-- Features -->
+    <div id="features" class="accordion-1">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-12">
+                    <h2 class="h2-heading">Características de CroPix</h2>
+                    <p class="p-heading">Tecnología de IA de última generación, resultados precisos, interfaz sencilla y descargas gratuitas en varios formatos.</p>
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->   
+            <div class="row">
+                <div class="col-xl-5">
+                    <div class="accordion" id="accordionExample">
+                        
+                        <!-- Accordion Item -->
+                        <div class="accordion-item">
+                            <div class="accordion-icon">
+                                <span class="fas fa-robot"></span>
+                            </div> <!-- end of accordion-icon -->
+                            <div class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    IA avanzada para quitar fondos
+                                </button>
+                            </div> <!-- end of accordion-header -->
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">Algoritmos inteligentes que reconocen personas, objetos y productos para separar el fondo con precisión profesional.</div>
+                            </div> <!-- end of accordion-collapse -->
+                        </div> <!-- end of accordion-item -->
+
+                        <!-- Accordion Item -->
+                        <div class="accordion-item">
+                            <div class="accordion-icon blue">
+                                <span class="fas fa-download"></span>
+                            </div> <!-- end of accordion-icon -->
+                            <div class="accordion-header" id="headingTwo">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Descarga en PNG, WebP y SVG
+                                </button>
+                            </div> <!-- end of accordion-header -->
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">Obtén tu imagen sin fondo en los formatos más usados y compatibles con transparencia.</div>
+                            </div> <!-- end of accordion-collapse -->
+                        </div> <!-- end of accordion-item -->
+
+                        <!-- Accordion Item -->
+                        <div class="accordion-item">
+                            <div class="accordion-icon purple">
+                                <span class="fas fa-thumbs-up"></span>
+                            </div> <!-- end of accordion-icon -->
+                            <div class="accordion-header" id="headingThree">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Fácil y rápido
+                                </button>
+                            </div> <!-- end of accordion-header -->
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">Solo sube tu imagen y descarga el resultado en segundos. Sin pasos complicados ni esperas largas.</div>
+                            </div> <!-- end of accordion-collapse -->
+                        </div> <!-- end of accordion-item -->
+                        
+                        <!-- Accordion Item -->
+                        <div class="accordion-item">
+                            <div class="accordion-icon orange">
+                                <span class="fas fa-shield-alt"></span>
+                            </div> <!-- end of accordion-icon -->
+                            <div class="accordion-header" id="headingFour">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    Privacidad garantizada
+                                </button>
+                            </div> <!-- end of accordion-header -->
+                            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">Tus imágenes no se almacenan ni se comparten. Solo tú tienes acceso a los resultados.</div>
+                            </div> <!-- end of accordion-collapse -->
+                        </div> <!-- end of accordion-item -->
+
+                    </div> <!-- end of accordion -->
+                </div> <!-- end of col -->
+                <div class="col-xl-7">
+                    <div class="image-container">
+                        <img class="img-fluid" src="{% static 'images/features-dashboard.png' %}" alt="Características IA">
+                    </div> <!-- end of image-container -->
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </div> <!-- end of accordion-1 -->
+    <!-- end of features -->
+
+
+    <!-- Testimonials -->
+    <div class="cards-2 bg-gray">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2 class="h2-heading">Opiniones de usuarios</h2>
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <!-- Card -->
+                    <div class="card">
+                        <img class="quotes" src="{% static 'images/quotes.svg' %}" alt="Testimonio">
+                        <div class="card-body">
+                            <p class="testimonial-text">¡Increíble! Quité el fondo de mis fotos de productos en segundos y gratis. La calidad es excelente.</p>
+                            <div class="testimonial-author">Roe Smith</div>
+                            <div class="occupation">Tienda Online</div>
+                        </div>
+                        <div class="gradient-floor red-to-blue"></div>
+                    </div>
+                    <!-- end of card -->
+
+                    <!-- Card -->
+                    <div class="card">
+                        <img class="quotes" src="{% static 'images/quotes.svg' %}" alt="Testimonio">
+                        <div class="card-body">
+                            <p class="testimonial-text">La IA funciona perfecto, no tuve que editar nada manualmente. Súper recomendado para diseñadores.</p>
+                            <div class="testimonial-author">Sam Bloom</div>
+                            <div class="occupation">Diseñador gráfico</div>
+                        </div>
+                        <div class="gradient-floor blue-to-purple"></div>
+                    </div>
+                    <!-- end of card -->
+
+                    <!-- Card -->
+                    <div class="card">
+                        <img class="quotes" src="{% static 'images/quotes.svg' %}" alt="Testimonio">
+                        <div class="card-body">
+                            <p class="testimonial-text">Me encanta que sea gratis y sin registro. Ideal para mis publicaciones en redes sociales.</p>
+                            <div class="testimonial-author">Bill McKenzie</div>
+                            <div class="occupation">Community Manager</div>
+                        </div>
+                        <div class="gradient-floor purple-to-green"></div>
+                    </div>
+                    <!-- end of card -->
+                    
+                    <!-- Card -->
+                    <div class="card">
+                        <img class="quotes" src="{% static 'images/quotes.svg' %}" alt="Testimonio">
+                        <div class="card-body">
+                            <p class="testimonial-text">Muy fácil de usar y los resultados son profesionales. ¡Gracias CroPix!</p>
+                            <div class="testimonial-author">Vanya Dropper</div>
+                            <div class="occupation">Fotógrafa</div>
+                        </div>
+                        <div class="gradient-floor red-to-blue"></div>
+                    </div>
+                    <!-- end of card -->
+
+                    <!-- Card -->
+                    <div class="card">
+                        <img class="quotes" src="{% static 'images/quotes.svg' %}" alt="Testimonio">
+                        <div class="card-body">
+                            <p class="testimonial-text">La mejor herramienta de IA para quitar fondos, y encima gratis. ¡La recomiendo!</p>
+                            <div class="testimonial-author">Lefty Brown</div>
+                            <div class="occupation">Emprendedor</div>
+                        </div>
+                        <div class="gradient-floor blue-to-purple"></div>
+                    </div>
+                    <!-- end of card -->
+
+                    <!-- Card -->
+                    <div class="card">
+                        <img class="quotes" src="{% static 'images/quotes.svg' %}" alt="Testimonio">
+                        <div class="card-body">
+                            <p class="testimonial-text">Rápido, gratis y seguro. CroPix me ahorra mucho tiempo en mi trabajo.</p>
+                            <div class="testimonial-author">Susane Blake</div>
+                            <div class="occupation">Editora de imágenes</div>
+                        </div>
+                        <div class="gradient-floor purple-to-green"></div>
+                    </div>
+                    <!-- end of card -->
+
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </div> <!-- end of cards-2 -->
+    <!-- end of testimonials -->
+
+
+    <!-- Customers -->
+    <div class="slider-1">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h4>Más de <span class="blue">5000</span> usuarios confían en CroPix</h4>
+                    <hr class="section-divider">
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </div> <!-- end of slider-1 -->
+    <!-- end of customers -->
+
+
+    <!-- Invitation -->
+    <div class="basic-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="text-container">
+                        <h2>¡Prueba CroPix gratis ahora!</h2>
+                        <p class="p-large">Sube tu imagen y deja que la inteligencia artificial elimine el fondo por ti. Rápido, fácil y sin costo.</p>
+                        <a class="btn-solid-lg" href="/remove">Quitar fondo gratis</a>
+                        <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'C0C01JV8BC');kofiwidget2.draw();</script> 
+                        <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+<script>
+  kofiWidgetOverlay.draw('datawreckers', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Support me',
+    'floating-chat.donateButton.background-color': '#00b9fe',
+    'floating-chat.donateButton.text-color': '#fff'
+  });
+</script>
+<iframe id='kofiframe' src='https://ko-fi.com/datawreckers/?hidefeed=true&widget=true&embed=true&preview=true' style='border:none;width:100%;padding:4px;background:#f9f9f9;' height='712' title='datawreckers'></iframe>
+                    </div> <!-- end of text-container -->
+                </div> <!-- end of col -->
+            </div> <!-- end of row -->
+        </div> <!-- end of container -->
+    </div> <!-- end of basic-3 -->
+    <!-- end of invitation -->
+
+{% endblock %}
