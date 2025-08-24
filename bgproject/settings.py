@@ -86,6 +86,7 @@ USE_TZ = True
 
 # Archivos estáticos
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'bgremove' / 'static']
 # Opcional para producción (collectstatic):
 STATIC_ROOT = BASE_DIR / "staticfiles"
 # Archivos subidos por el usuario (si los quieres guardar)
