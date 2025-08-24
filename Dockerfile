@@ -19,5 +19,5 @@ RUN pip install django rembg pillow gunicorn onnxruntime
 # Expone el puerto de Django
 EXPOSE 8000
 
-# Comando para iniciar el servidor con Gunicorn
-CMD ["gunicorn", "bgproject.wsgi:application", "--bind", "0.0.0.0:8000"]
+# Ejecuta collectstatic antes de iniciar Gunicorn
+CMD ["sh", "-c", "python manage.py collectstatic --noinput && gunicorn bgproject.wsgi:application --bind 0.0.0.0:8000"]
