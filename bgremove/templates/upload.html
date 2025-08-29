@@ -2,39 +2,134 @@
 
 {% block title %}Remove Background - CroPix{% endblock %}
 
-{%block extra_head %}
+{% block extra_head %}
 <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; padding: 24px; background: #f6f7fb; color: #111; }
-    .card { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); padding: 24px; }
-    h1 { font-size: 22px; margin: 0 0 16px; }
+    body {
+        font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+        background: #f6f7fb;
+        color: #222;
+        padding: 0;
+        margin: 0;
+    }
+    .card {
+        max-width: 900px;
+        margin: 32px auto;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+        padding: 32px 28px 24px 28px;
+    }
+    h1 {
+        font-size: 26px;
+        margin: 0 0 24px;
+        font-weight: 700;
+        letter-spacing: -1px;
+        color: #2563eb;
+    }
     .responsive-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 32px;
+        gap: 40px;
         align-items: start;
     }
-    @media (max-width: 800px) {
+    @media (max-width: 900px) {
         .responsive-grid {
             grid-template-columns: 1fr;
+            gap: 24px;
+        }
+        .card {
+            padding: 18px 8px 12px 8px;
         }
     }
-    .upload-btn { display: flex; justify-content: center; align-items: center; margin-bottom: 24px; position: relative; }
+    .upload-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 24px;
+        position: relative;
+    }
     .upload-btn input[type="file"] { display: none; }
-    .upload-btn label { background: #2563eb; color: white; border-radius: 8px; padding: 14px 32px; font-weight: 600; cursor: pointer; font-size: 16px; transition: background 0.2s; }
-    .upload-btn label:hover { background: #1d4ed8; }
-    .canvas-wrap { position: relative; width: 100%; background: #eef2ff; border-radius: 8px; overflow: hidden; min-height: 320px; display: flex; align-items: center; justify-content: center; }
-    canvas { width: 100%; height: auto; display: block; background: #f8fafc; }
-    .legend { font-size: 12px; color: #374151; margin-top: 12px; }
-    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #111; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; color: #111; }
-    .swatch.selected { outline: 3px solid #111; }
-    .field { margin: 16px 0; }
-    .hidden { display: none; }
+    .upload-btn label {
+        background: linear-gradient(90deg,#2563eb 60%,#22c55e 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 16px 38px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 18px;
+        box-shadow: 0 2px 8px #2563eb22;
+        transition: background 0.2s, box-shadow 0.2s;
+        border: none;
+    }
+    .upload-btn label:hover {
+        background: linear-gradient(90deg,#1d4ed8 60%,#16a34a 100%);
+        box-shadow: 0 4px 16px #2563eb33;
+    }
+    .canvas-wrap {
+        position: relative;
+        width: 480px;
+        height: 480px;
+        margin: 0 auto;
+        background: #eef2ff;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px #2563eb11;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        background: #f8fafc;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px #2563eb11;
+    }
+    .legend {
+        font-size: 13px;
+        color: #374151;
+        margin-top: 18px;
+        background: #f1f5f9;
+        padding: 10px 18px;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px #2563eb11;
+    }
+    .toolbar {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+    }
+    .swatch {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid #2563eb;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #fff;
+        margin-right: 10px;
+        box-shadow: 0 2px 8px #2563eb22;
+        transition: border 0.2s, box-shadow 0.2s;
+    }
+    .swatch.selected {
+        outline: 3px solid #22c55e;
+        border: 2px solid #22c55e;
+        box-shadow: 0 4px 16px #22c55e33;
+    }
+    .swatch[data-color="keep"] { background: #22c55e; }
+    .swatch[data-color="remove"] { background: #ef4444; }
+    .field { margin: 20px 0; }
     .download-row {
         display: flex;
         gap: 0;
         align-items: center;
-        margin-bottom: 24px;
+        margin-bottom: 28px;
         margin-top: 0;
         flex-wrap: wrap;
         width: 100%;
@@ -44,82 +139,201 @@
         background: #2563eb;
         color: white;
         border: none;
-        border-radius: 8px 0 0 8px;
-        padding: 10px 24px;
+        border-radius: 10px 0 0 10px;
+        padding: 12px 30px;
         font-weight: 600;
         cursor: pointer;
-        font-size: 16px;
+        font-size: 18px;
         transition: background 0.2s;
         margin-right: -1px;
         z-index: 2;
+        box-shadow: 0 2px 8px #2563eb22;
     }
     #downloadBtn:disabled {
         background: #a5b4fc;
         cursor: not-allowed;
     }
     #formatSelect, #resolutionSelect {
-        padding: 10px 18px;
+        padding: 12px 22px;
         border: none;
-        font-size: 16px;
+        font-size: 18px;
         font-weight: 600;
         background: #2563eb;
         color: white;
         z-index: 1;
+        box-shadow: 0 2px 8px #2563eb22;
     }
     #formatSelect {
         border-radius: 0;
     }
     #resolutionSelect {
-        border-radius: 0 8px 8px 0;
+        border-radius: 0 10px 10px 0;
     }
-    .download-row > * {
-        box-shadow: 0 2px 8px #0001;
+    .bg-preset {
+        width: 28px;
+        height: 28px;
+        border: 2px solid #ccc;
+        border-radius: 50%;
+        margin-right: 6px;
+        cursor: pointer;
+        outline: none;
+        box-shadow: 0 2px 8px #2563eb11;
+        transition: border 0.2s;
+    }
+    .bg-preset.selected {
+        border: 2px solid #2563eb;
+        box-shadow: 0 4px 16px #2563eb33;
+    }
+    #bgColor {
+        margin-left: 8px;
+        border-radius: 6px;
+        border: 1px solid #2563eb44;
+        box-shadow: 0 2px 8px #2563eb11;
+    }
+    .btn, .btn-secondary, .btn-success {
+        border-radius: 8px;
+        font-size: 16px;
+        padding: 8px 18px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        margin-right: 8px;
+        transition: background 0.2s;
+    }
+    .btn-secondary { background: #e5e7eb; color: #222; }
+    .btn-success { background: #22c55e; color: #fff; }
+    .btn-secondary:hover { background: #d1d5db; }
+    .btn-success:hover { background: #16a34a; }
+    .btn:disabled { background: #f3f4f6; color: #aaa; cursor: not-allowed; }
+    #toaster {
+        position:fixed;
+        bottom:32px;
+        left:50%;
+        transform:translateX(-50%);
+        background:#22c55e;
+        color:#fff;
+        padding:16px 32px;
+        border-radius:10px;
+        font-weight:600;
+        box-shadow:0 4px 16px #0002;
+        opacity:0;
+        transition:opacity 0.5s;
+        z-index:10000;
+        pointer-events:none;
+        font-size: 18px;
+    }
+    #transitionCurtain {
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+    /* Barra de progreso en cortina */
+    #progressBar {
+        width:60%;
+        height:8px;
+        background:#fff2;
+        border-radius:4px;
+        overflow:hidden;
+        display:none;
+        position:absolute;
+        bottom:32px;
+        left:20%;
+    }
+    #progressFill {
+        width:0;
+        height:100%;
+        background:#fff;
+        transition:width 0.7s;
+    }
+    #uploadLabel span {
+        font-size: 14px;
+        color: #2563eb;
+        margin-left: 12px;
+        font-weight: 500;
+    }
+    /* Responsive for mobile */
+    @media (max-width: 600px) {
+        .canvas-wrap { width: 98vw; height: 60vw; min-height: 220px; }
+        canvas { border-radius: 8px; }
+        .card { padding: 8px 2vw; }
+        .download-row { flex-direction: column; gap: 8px; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1>Procesar imagen (API)</h1>
+<div id="remove">
+    <br>
+    <br>
+</div>
+<div class="card" >
+    <h1>Quita el fondo de tu imagen</h1>
     <form id="form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="responsive-grid">
             <div>
                 <div class="upload-btn" id="uploadBtnWrap">
-                    <input id="image" type="file" name="image" accept="image/*" required>
-                    <label for="image" id="uploadLabel">Subir imagen</label>
+                    <input id="image" type="file" name="image" accept="image/*">
+                    <label for="image" id="uploadLabel">Subir imagen <span id="fileName"></span></label>
                 </div>
-                <div class="canvas-wrap">
-                    <canvas id="canvas"></canvas>
+                <div class="canvas-wrap" style="position:relative; width:480px; height:480px; margin:0 auto;">
+                    <canvas id="canvas" width="480" height="480" style="width:100%; height:100%;"></canvas>
+                    <div id="transitionCurtain" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#2563eb;opacity:0;pointer-events:none;z-index:2;transition:transform 0.7s cubic-bezier(.77,0,.18,1), opacity 0.3s; transform:translateX(-100%);">
+                        <div id="progressBar">
+                            <div id="progressFill"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="legend">Pincel guía (escala de grises): blanco=255 sujeto (conservar), negro=0 fondo (quitar), gris=128 desconocido.</div>
+                <div class="legend">
+                    <strong>Pincel verde</strong> = conservar, <strong>pincel rojo</strong> = quitar fondo.<br>
+                    Si no te gusta el resultado automático, usa los pinceles y haz clic en <b>Procesar</b>.
+                </div>
             </div>
             <div>
-                <div class="download-row">
-                    <button type="button" id="downloadBtn" disabled>Descargar</button>
-                    <select id="formatSelect">
-                        <option value="png">PNG</option>
-                        <option value="webp">WebP</option>
-                        <option value="svg">SVG</option>
-                    </select>
-                    <select id="resolutionSelect">
-                        <option value="1">1x</option>
-                        <option value="2">2x</option>
-                        <option value="4">4x</option>
-                        <option value="8">8x</option>
-                    </select>
+                <div class="download-row" style="flex-direction:column;align-items:flex-start;gap:0;">
+                    <div class="download-combo" style="display:flex;flex-direction:row;align-items:center;width:100%;">
+                        <button type="button" id="downloadBtn" disabled title="Descargar imagen" style="border-radius:10px;flex:1 1 auto;min-width:160px;max-width:240px;font-size:18px;padding:12px 18px;display:flex;align-items:center;justify-content:center;gap:12px;">
+                            <span style="font-size:22px;">&#128190;</span>
+                            <span>Descargar</span>
+                        </button>
+                        <select id="formatSelect" title="Formato de descarga" style="margin-left:-1px;border-radius:0;min-width:80px;font-size:16px;">
+                            <option value="png">PNG</option>
+                            <option value="webp">WebP</option>
+                            <option value="svg">SVG</option>
+                        </select>
+                        <select id="resolutionSelect" title="Resolución" style="margin-left:-1px;border-radius:0 10px 10px 0;min-width:80px;font-size:16px;">
+                            <option value="1">1x</option>
+                            <option value="2">2x</option>
+                            <option value="4">4x</option>
+                            <option value="8">8x</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="field">
                     <label>Herramientas</label>
                     <div class="toolbar">
-                        <div class="swatch selected" data-color="keep" title="Sujeto" style="background:#ffffff">S</div>
-                        <div class="swatch" data-color="remove" title="Fondo" style="background:#000000; color:#fff;">F</div>
-                        <div class="swatch" data-color="unknown" title="Desconocido" style="background:#9ca3af">?</div>
+                        <div class="swatch selected" data-color="keep" title="Conservar">&#x2714;</div>
+                        <div class="swatch" data-color="remove" title="Quitar fondo">&#x2716;</div>
                         <label style="margin-left:10px;">Grosor
                             <input id="size" type="range" min="5" max="80" value="24">
                         </label>
-                        <button type="button" id="clear" style="background:#6b7280">Limpiar</button>
+                        <button type="button" id="clear" class="btn btn-secondary btn-sm" title="Limpiar máscara">&#128465; Limpiar</button>
+                        <button type="button" id="processBtn" class="btn btn-success btn-sm" title="Procesar imagen">&#9881; Procesar</button>
+                        <button type="button" id="undoBtn" class="btn btn-secondary btn-sm" title="Deshacer último trazo">&#8630; Deshacer</button>
                     </div>
+                </div>
+                <div class="field">
+                    <label style="margin-left:10px;">Fondo
+                        <span id="presetColors">
+                            <button type="button" class="bg-preset" data-color="transparent" style="background: repeating-linear-gradient(45deg,#ccc 0 8px,#fff 8px 16px);" title="Sin fondo">✕</button>
+                            <button type="button" class="bg-preset" data-color="#ffffff" style="background:#fff;" title="Blanco"></button>
+                            <button type="button" class="bg-preset" data-color="#000000" style="background:#000;" title="Negro"></button>
+                            <button type="button" class="bg-preset" data-color="#2563eb" style="background:#2563eb;" title="Azul"></button>
+                            <button type="button" class="bg-preset" data-color="#22c55e" style="background:#22c55e;" title="Verde"></button>
+                            <button type="button" class="bg-preset" data-color="#ef4444" style="background:#ef4444;" title="Rojo"></button>
+                        </span>
+                        <input type="color" id="bgColor" value="#ffffff" style="width:32px; height:32px; border:none; vertical-align:middle;" title="Color personalizado">
+                    </label>
                 </div>
             </div>
         </div>
@@ -129,8 +343,11 @@
     <div id="status" class="hint" style="margin-top:12px;"></div>
 </div>
 
+<div id="toaster"></div>
+
 <script>
 const fileInput = document.getElementById('image');
+const fileNameSpan = document.getElementById('fileName');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const maskField = document.getElementById('mask_data');
@@ -139,53 +356,128 @@ const uploadBtnWrap = document.getElementById('uploadBtnWrap');
 const downloadBtn = document.getElementById('downloadBtn');
 const formatSelect = document.getElementById('formatSelect');
 const resolutionSelect = document.getElementById('resolutionSelect');
-
-const drawLayer = document.createElement('canvas');
-const drawCtx = drawLayer.getContext('2d');
-
+const processBtn = document.getElementById('processBtn');
 const sizeInput = document.getElementById('size');
 const clearBtn = document.getElementById('clear');
+const bgColorInput = document.getElementById('bgColor');
+const undoBtn = document.getElementById('undoBtn');
+const curtain = document.getElementById('transitionCurtain');
+const toaster = document.getElementById('toaster');
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
 
+let currentBgColor = "#ffffff";
 let brush = 'keep';
 let drawing = false;
 let imgBitmap = null;
 let dirty = false;
 let lastResultDataUrl = null;
 let lastResultImg = null;
+let originalImg = null;
+let maskHistory = [];
+const drawLayer = document.createElement('canvas');
+const drawCtx = drawLayer.getContext('2d');
+
+// Mostrar nombre de archivo subido
+fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    fileNameSpan.textContent = file ? file.name : '';
+});
+
+// Fondo preestablecido y personalizado
+document.querySelectorAll('.bg-preset').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.bg-preset').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        currentBgColor = btn.dataset.color;
+        bgColorInput.value = currentBgColor === "transparent" ? "#ffffff" : currentBgColor;
+        if (lastResultImg) drawResultOnCanvas(lastResultDataUrl);
+    });
+});
+bgColorInput.addEventListener('input', function() {
+    currentBgColor = bgColorInput.value;
+    document.querySelectorAll('.bg-preset').forEach(b => b.classList.remove('selected'));
+    if (lastResultImg) drawResultOnCanvas(lastResultDataUrl);
+});
+
+// Arrastrar y soltar imagen
+uploadBtnWrap.addEventListener('dragover', e => { e.preventDefault(); uploadBtnWrap.style.background = "#dbeafe"; });
+uploadBtnWrap.addEventListener('dragleave', e => { e.preventDefault(); uploadBtnWrap.style.background = ""; });
+uploadBtnWrap.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadBtnWrap.style.background = "";
+    if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+    }
+});
+
+// Carga imagen y procesamiento automático
+fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    showCurtain();
+    showProgressBar();
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+            imgBitmap = img;
+            originalImg = img;
+            setCanvasSize(img.width, img.height);
+            render();
+            uploadBtnWrap.style.display = 'none';
+            showToaster('Procesando imagen automáticamente...');
+            setTimeout(() => {
+                processBtn.click();
+            }, 100);
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+});
 
 function setCanvasSize(w, h) {
     canvas.width = w;
     canvas.height = h;
     drawLayer.width = w;
     drawLayer.height = h;
-    drawCtx.fillStyle = 'rgb(128,128,128)';
-    drawCtx.fillRect(0, 0, w, h);
+    drawCtx.clearRect(0, 0, w, h);
     dirty = false;
+    maskHistory = [];
     render();
 }
 
 function render() {
-    if (!imgBitmap) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(imgBitmap, 0, 0, canvas.width, canvas.height);
-    ctx.globalAlpha = 0.35;
+    if (originalImg) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(originalImg, 0, 0, canvas.width, canvas.height);
+    }
+    ctx.globalAlpha = 0.5;
     ctx.drawImage(drawLayer, 0, 0);
     ctx.globalAlpha = 1;
 }
 
 function valueForBrush() {
-    if (brush === 'keep') return 255;
-    if (brush === 'remove') return 0;
-    return 128;
+    if (brush === 'keep') return 'rgb(34,197,94)';
+    if (brush === 'remove') return 'rgb(239,68,68)';
+    return 'rgba(0,0,0,0)';
 }
 
 function drawDot(x, y, r) {
-    const v = valueForBrush();
-    drawCtx.fillStyle = `rgb(${v},${v},${v})`;
+    // Limita el historial a los últimos 200 estados
+    if (maskHistory.length > 200) maskHistory.shift();
+    maskHistory.push(drawCtx.getImageData(0, 0, drawLayer.width, drawLayer.height));
+    drawCtx.save();
     drawCtx.beginPath();
     drawCtx.arc(x, y, r, 0, Math.PI * 2);
+    drawCtx.closePath();
+    drawCtx.fillStyle = valueForBrush();
+    drawCtx.globalAlpha = 0.7;
     drawCtx.fill();
+    drawCtx.restore();
     dirty = true;
+    render();
 }
 
 function getPos(e) {
@@ -195,12 +487,12 @@ function getPos(e) {
     return { x: x * (canvas.width / rect.width), y: y * (canvas.height / rect.height) };
 }
 
-canvas.addEventListener('mousedown', (e) => { drawing = true; const p = getPos(e); drawDot(p.x, p.y, +sizeInput.value/2); render(); });
-canvas.addEventListener('touchstart', (e) => { drawing = true; const p = getPos(e); drawDot(p.x, p.y, +sizeInput.value/2); render(); e.preventDefault(); }, { passive: false });
+canvas.addEventListener('mousedown', (e) => { drawing = true; const p = getPos(e); drawDot(p.x, p.y, +sizeInput.value/2); });
+canvas.addEventListener('touchstart', (e) => { drawing = true; const p = getPos(e); drawDot(p.x, p.y, +sizeInput.value/2); e.preventDefault(); }, { passive: false });
 window.addEventListener('mouseup', () => drawing = false);
 window.addEventListener('touchend', () => drawing = false);
-canvas.addEventListener('mousemove', (e) => { if (!drawing) return; const p = getPos(e); drawDot(p.x, p.y, +sizeInput.value/2); render(); });
-canvas.addEventListener('touchmove', (e) => { if (!drawing) return; const p = getPos(e); drawDot(p.x, p.y, +sizeInput.value/2); render(); e.preventDefault(); }, { passive: false });
+canvas.addEventListener('mousemove', (e) => { if (!drawing) return; const p = getPos(e); drawDot(p.x, p.y, +sizeInput.value/2); });
+canvas.addEventListener('touchmove', (e) => { if (!drawing) return; const p = getPos(e); drawDot(p.x, p.y, +sizeInput.value/2); e.preventDefault(); }, { passive: false });
 
 document.querySelectorAll('.swatch').forEach(el => {
     el.addEventListener('click', () => {
@@ -211,61 +503,118 @@ document.querySelectorAll('.swatch').forEach(el => {
 });
 
 clearBtn.addEventListener('click', () => {
-    drawCtx.fillStyle = 'rgb(128,128,128)';
-    drawCtx.fillRect(0, 0, drawLayer.width, drawLayer.height);
-    dirty = false;
-    render();
+    if (confirm("¿Seguro que quieres limpiar la máscara?")) {
+        drawCtx.clearRect(0, 0, drawLayer.width, drawLayer.height);
+        dirty = false;
+        maskHistory = [];
+        render();
+    }
 });
 
-fileInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    imgBitmap = await createImageBitmap(file);
-    setCanvasSize(imgBitmap.width, imgBitmap.height);
-    render();
-    uploadBtnWrap.style.display = 'none';
-    statusEl.textContent = 'Procesando...';
+undoBtn.addEventListener('click', () => {
+    if (maskHistory.length) {
+        drawCtx.putImageData(maskHistory.pop(), 0, 0);
+        render();
+    }
+});
+
+// Atajos de teclado
+document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 'z') { undoBtn.click(); }
+    if (e.ctrlKey && e.key === 'l') { clearBtn.click(); }
+});
+
+// Cortina y barra de progreso
+function showCurtain() {
+    curtain.style.opacity = "0.85";
+    curtain.style.pointerEvents = "auto";
+    curtain.style.transform = "translateX(0)";
+}
+function hideCurtain() {
+    curtain.style.opacity = "0";
+    curtain.style.transform = "translateX(-100%)";
+    setTimeout(() => { curtain.style.pointerEvents = "none"; hideProgressBar(); }, 700);
+}
+function showToaster(msg, color="#22c55e") {
+    toaster.textContent = msg;
+    toaster.style.background = color;
+    toaster.style.opacity = "1";
+    toaster.style.pointerEvents = "auto";
+    setTimeout(() => {
+        toaster.style.opacity = "0";
+        toaster.style.pointerEvents = "none";
+    }, 2500);
+}
+function showProgressBar() {
+    progressBar.style.display = "block";
+    progressFill.style.width = "0";
+    setTimeout(() => { progressFill.style.width = "100%"; }, 100);
+}
+function hideProgressBar() {
+    progressBar.style.display = "none";
+    progressFill.style.width = "0";
+}
+
+// Procesar imagen
+processBtn.addEventListener('click', () => {
+    if (!imgBitmap) return;
+    showCurtain();
+    showProgressBar();
     let maskData = '';
     if (dirty) {
         maskData = drawLayer.toDataURL('image/png');
     }
+    processImage(fileInput.files[0], maskData);
+});
+
+function processImage(file, maskData) {
     const fd = new FormData();
     fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
     fd.append('image', file);
-    fd.append('mask_data', maskData);
+    if (maskData) fd.append('mask_data', maskData);
     fd.append('mode', 'keep_subject');
-    try {
-        const resp = await fetch('/api/remove/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': fd.get('csrfmiddlewaretoken')
-            },
-            body: fd
-        });
-        const data = await resp.json();
+    fetch('/api/remove/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': fd.get('csrfmiddlewaretoken')
+        },
+        body: fd
+    })
+    .then(resp => resp.json())
+    .then( data => {
+        hideCurtain();
         if(!data.success){
-            statusEl.textContent = 'Error: ' + (data.error || 'desconocido');
+            showToaster('Error: ' + (data.error || 'desconocido'), "#ef4444");
             downloadBtn.disabled = true;
+            render();
         } else {
-            statusEl.textContent = 'Listo.';
             lastResultDataUrl = data.image_data;
             drawResultOnCanvas(data.image_data);
             downloadBtn.disabled = false;
+            showToaster('Procesamiento exitoso');
         }
-    } catch(err){
-        statusEl.textContent = 'Error de red.';
+    })
+    .catch(() => {
+        hideCurtain();
+        showToaster('Error de red.', "#ef4444");
         downloadBtn.disabled = true;
-    }
-});
+        render();
+    });
+}
 
 function drawResultOnCanvas(dataURL){
     const img = new Image();
     img.onload = () => {
         lastResultImg = img;
         const w = img.width, h = img.height;
-        canvas.width = w; canvas.height = h;
-        ctx.clearRect(0, 0, w, h);
-        ctx.drawImage(img,0,0);
+        canvas.width = w;
+        canvas.height = h;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (currentBgColor !== "transparent") {
+            ctx.fillStyle = currentBgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        ctx.drawImage(img, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
     };
     img.src = dataURL;
 }
@@ -278,12 +627,15 @@ downloadBtn.addEventListener('click', () => {
     const w = lastResultImg.width * scale;
     const h = lastResultImg.height * scale;
 
-    // Crear canvas temporal para exportar en la resolución deseada
     const exportCanvas = document.createElement('canvas');
     exportCanvas.width = w;
     exportCanvas.height = h;
     const exportCtx = exportCanvas.getContext('2d');
     exportCtx.clearRect(0, 0, w, h);
+    if (currentBgColor !== "transparent") {
+        exportCtx.fillStyle = currentBgColor;
+        exportCtx.fillRect(0, 0, w, h);
+    }
     exportCtx.drawImage(lastResultImg, 0, 0, w, h);
 
     if (format === 'png') {
@@ -297,7 +649,6 @@ downloadBtn.addEventListener('click', () => {
             downloadBlob(url, `imagen-procesada-${scale}x.webp`);
         }, 'image/webp');
     } else if (format === 'svg') {
-        // Rasteriza como PNG embebido en SVG
         const dataURL = exportCanvas.toDataURL('image/png');
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
             <image href="${dataURL}" width="${w}" height="${h}"/>

@@ -15,7 +15,7 @@ MODEL_PATH = MODEL_DIR / "u2net.onnx"
 MODEL_URL = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net.onnx"
 
 # Inicializamos la sesión global
-rembg_session = None
+rembg_session = new_session("sam")
 
 def load_model():
     global rembg_session
@@ -41,77 +41,58 @@ load_model()
 
 # Extraemos la lógica en una función reutilizable
 def _process_image(img: Image.Image, mode: str, mask_data: str | None):
-    """
-    Devuelve un objeto PIL (resultado) según el modo.
-    Si mask_data contiene una máscara guiada, intenta usar GrabCut.
-    """
-    # Normalizamos modo
-    if mode not in ("keep_subject", "keep_background", "mask"):
-        mode = "keep_subject"
-
-    # Intento con máscara guiada (GrabCut)
+    import numpy as np, cv2, base64, io
+    # Usa SAM para el recorte automático
     if mask_data:
-        try:
-            import numpy as np, cv2, base64, io
-            if "," in mask_data:
-                _, b64 = mask_data.split(",", 1)
-            else:
-                b64 = mask_data
-            mask_bytes = base64.b64decode(b64)
-            user_mask = Image.open(io.BytesIO(mask_bytes)).convert("L")
-            if user_mask.size != img.size:
-                user_mask = user_mask.resize(img.size, Image.NEAREST)
+        if "," in mask_data:
+            _, b64 = mask_data.split(",", 1)
+        else:
+            b64 = mask_data
+        mask_bytes = base64.b64decode(b64)
+        user_mask = Image.open(io.BytesIO(mask_bytes)).convert("RGB")
+        if user_mask.size != img.size:
+            user_mask = user_mask.resize(img.size, Image.NEAREST)
 
-            rgb = img.convert("RGB")
-            img_np = np.array(rgb)
-            img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+        # IA: fondo automático
+        auto_result = remove(img, session=rembg_session)
+        auto_mask = auto_result.split()[-1]  # canal alpha
 
-            m = np.array(user_mask)
-            gc_mask = np.full(m.shape, cv2.GC_PR_BGD, dtype=np.uint8)
-            gc_mask[m <= 10] = cv2.GC_BGD
-            gc_mask[m >= 245] = cv2.GC_FGD
+        user_mask_np = np.array(user_mask)
+        auto_mask_np = np.array(auto_mask)
 
-            bgdModel = np.zeros((1, 65), np.float64)
-            fgdModel = np.zeros((1, 65), np.float64)
-            cv2.grabCut(img_bgr, gc_mask, None, bgdModel, fgdModel, 5, cv2.GC_INIT_WITH_MASK)
+        # --- Tolerancia en color ---
+        def is_near(c, t, tol=20):
+            return np.all(np.abs(c - t) < tol, axis=-1)
 
-            final_mask_np = np.where(
-                (gc_mask == cv2.GC_FGD) | (gc_mask == cv2.GC_PR_FGD), 255, 0
-            ).astype("uint8")
-            final_mask = Image.fromarray(final_mask_np, mode="L")
+        keep = is_near(user_mask_np, np.array([34,197,94]), 20)
+        remove_ = is_near(user_mask_np, np.array([239,68,68]), 20)
 
-            if mode == "mask":
-                return final_mask
+        # --- Crea máscara binaria ---
+        mask_bin = np.zeros_like(auto_mask_np)
+        mask_bin[keep] = 255
+        mask_bin[remove_] = 0
+        untouched = ~(keep | remove_)
+        mask_bin[untouched] = auto_mask_np[untouched]
 
-            base = img.copy()
-            if mode == "keep_subject":
-                alpha = final_mask
-            else:
-                alpha = ImageOps.invert(final_mask)
-            base.putalpha(alpha)
-            return base
-        except Exception:
-            # Fallback automático
-            pass
+        # --- Filtro para mejorar bordes ---
+        # Suaviza bordes con blur
+        mask_bin = cv2.GaussianBlur(mask_bin, (11,11), sigmaX=5)
+        # Detecta bordes y los refuerza
+        edges = cv2.Canny(mask_bin, 50, 150)
+        mask_bin[edges > 0] = 255  # Refuerza bordes detectados
 
-    # Flujo automático rembg
-    if mode == "keep_subject":
-        output_img = remove(img, session=rembg_session)
-        if output_img.mode != "RGBA":
-            output_img = output_img.convert("RGBA")
-    elif mode == "keep_background":
-        mask = remove(img, session=rembg_session, only_mask=True)
-        if mask.mode != "L":
-            mask = mask.convert("L")
-        inv_mask = ImageOps.invert(mask)
-        base = img.copy()
-        base.putalpha(inv_mask)
-        output_img = base
-    else:  # mask
-        mask = remove(img, session=rembg_session, only_mask=True)
-        if mask.mode != "L":
-            mask = mask.convert("L")
-        output_img = mask
+        # Opcional: dilata para expandir zonas pintadas
+        mask_bin = cv2.dilate(mask_bin, np.ones((5,5), np.uint8), iterations=1)
+
+        mask_bin = np.clip(mask_bin, 0, 255).astype("uint8")
+        result = img.convert("RGBA")
+        result.putalpha(Image.fromarray(mask_bin))
+        return result
+
+    # Si no hay máscara, IA automática
+    output_img = remove(img, session=rembg_session)
+    if output_img.mode != "RGBA":
+        output_img = output_img.convert("RGBA")
     return output_img
 
 def api_remove_background(request):

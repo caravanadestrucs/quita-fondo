@@ -14,7 +14,7 @@ COPY . /app
 
 # Instala dependencias de Python
 RUN pip install --upgrade pip
-RUN pip install django rembg pillow gunicorn onnxruntime
+RUN pip install django rembg pillow gunicorn onnxruntime rembg[sam] 
 
 # Expone el puerto de Django
 EXPOSE 8000
