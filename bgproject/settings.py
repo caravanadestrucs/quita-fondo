@@ -95,3 +95,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Configuración por defecto de clave primaria
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://cropix.site",
+]
