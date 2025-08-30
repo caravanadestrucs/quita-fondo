@@ -82,12 +82,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'es-es'
 TIME_ZONE = 'UTC'
 USE_I18N = True
-LANGUAGES = [
-    ('en', 'English'),
-    ('es', 'Español'),
-    ('de', 'Deutsch'),        # Alemán
-    
-]
+
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
@@ -112,3 +107,9 @@ CSRF_TRUSTED_ORIGINS = [
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+LANGUAGES = [
+    ('es', 'Español'),
+    ('en', 'English'),
+    # Agrega más si quieres, pero elimina o comenta 'de' si no tienes traducción
+]

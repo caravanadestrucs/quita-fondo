@@ -1,6 +1,5 @@
 # bgremove/views.py
 import os
-from django.utils.translation import gettext as _
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from rembg import remove, new_session
