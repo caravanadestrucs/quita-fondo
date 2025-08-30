@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Seguridad (solo para desarrollo, cambia en producción)
 SECRET_KEY = 'django-insecure-cambia-esto-en-produccion'
 DEBUG = True
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['cropix.site', 'www.cropix.site']
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
@@ -82,6 +82,15 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'es-es'
 TIME_ZONE = 'UTC'
 USE_I18N = True
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Español'),
+    ('de', 'Deutsch'),        # Alemán
+    
+]
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
 USE_TZ = True
 
 # Archivos estáticos
@@ -99,3 +108,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CSRF_TRUSTED_ORIGINS = [
     "https://cropix.site",
 ]
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True

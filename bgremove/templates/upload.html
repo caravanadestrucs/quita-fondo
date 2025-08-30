@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% load i18n %}
 
 {% block title %}Remove Background - CroPix{% endblock %}
 
@@ -267,14 +268,14 @@
     <br>
 </div>
 <div class="card" >
-    <h1>Quita el fondo de tu imagen</h1>
+    <h1>{% trans "Quita el fondo de tu imagen" %}</h1>
     <form id="form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="responsive-grid">
             <div>
                 <div class="upload-btn" id="uploadBtnWrap">
                     <input id="image" type="file" name="image" accept="image/*">
-                    <label for="image" id="uploadLabel">Subir imagen <span id="fileName"></span></label>
+                    <label for="image" id="uploadLabel">{% trans "Subir imagen" %} <span id="fileName"></span></label>
                 </div>
                 <div class="canvas-wrap" style="position:relative; width:480px; height:480px; margin:0 auto;">
                     <canvas id="canvas" width="480" height="480" style="width:100%; height:100%;"></canvas>
@@ -285,23 +286,23 @@
                     </div>
                 </div>
                 <div class="legend">
-                    <strong>Pincel verde</strong> = conservar, <strong>pincel rojo</strong> = quitar fondo.<br>
-                    Si no te gusta el resultado automático, usa los pinceles y haz clic en <b>Procesar</b>.
+                    <strong>{% trans "Pincel verde" %}</strong> = {% trans "conservar" %}, <strong>{% trans "pincel rojo" %}</strong> = {% trans "quitar fondo" %}.<br>
+                    {% trans "Si no te gusta el resultado automático, usa los pinceles y haz clic en" %} <b>{% trans "Procesar" %}</b>.
                 </div>
             </div>
             <div>
                 <div class="download-row" style="flex-direction:column;align-items:flex-start;gap:0;">
                     <div class="download-combo" style="display:flex;flex-direction:row;align-items:center;width:100%;">
-                        <button type="button" id="downloadBtn" disabled title="Descargar imagen" style="border-radius:10px;flex:1 1 auto;min-width:160px;max-width:240px;font-size:18px;padding:12px 18px;display:flex;align-items:center;justify-content:center;gap:12px;">
+                        <button type="button" id="downloadBtn" disabled title="{% trans 'Descargar imagen' %}" style="border-radius:10px;flex:1 1 auto;min-width:160px;max-width:240px;font-size:18px;padding:12px 18px;display:flex;align-items:center;justify-content:center;gap:12px;">
                             <span style="font-size:22px;">&#128190;</span>
-                            <span>Descargar</span>
+                            <span>{% trans "Descargar" %}</span>
                         </button>
-                        <select id="formatSelect" title="Formato de descarga" style="margin-left:-1px;border-radius:0;min-width:80px;font-size:16px;">
+                        <select id="formatSelect" title="{% trans 'Formato de descarga' %}" style="margin-left:-1px;border-radius:0;min-width:80px;font-size:16px;">
                             <option value="png">PNG</option>
                             <option value="webp">WebP</option>
                             <option value="svg">SVG</option>
                         </select>
-                        <select id="resolutionSelect" title="Resolución" style="margin-left:-1px;border-radius:0 10px 10px 0;min-width:80px;font-size:16px;">
+                        <select id="resolutionSelect" title="{% trans 'Resolución' %}" style="margin-left:-1px;border-radius:0 10px 10px 0;min-width:80px;font-size:16px;">
                             <option value="1">1x</option>
                             <option value="2">2x</option>
                             <option value="4">4x</option>
@@ -310,29 +311,29 @@
                     </div>
                 </div>
                 <div class="field">
-                    <label>Herramientas</label>
+                    <label>{% trans "Herramientas" %}</label>
                     <div class="toolbar">
-                        <div class="swatch selected" data-color="keep" title="Conservar">&#x2714;</div>
-                        <div class="swatch" data-color="remove" title="Quitar fondo">&#x2716;</div>
-                        <label style="margin-left:10px;">Grosor
+                        <div class="swatch selected" data-color="keep" title="{% trans 'Conservar' %}">&#x2714;</div>
+                        <div class="swatch" data-color="remove" title="{% trans 'Quitar fondo' %}">&#x2716;</div>
+                        <label style="margin-left:10px;">{% trans "Grosor" %}
                             <input id="size" type="range" min="5" max="80" value="24">
                         </label>
-                        <button type="button" id="clear" class="btn btn-secondary btn-sm" title="Limpiar máscara">&#128465; Limpiar</button>
-                        <button type="button" id="processBtn" class="btn btn-success btn-sm" title="Procesar imagen">&#9881; Procesar</button>
-                        <button type="button" id="undoBtn" class="btn btn-secondary btn-sm" title="Deshacer último trazo">&#8630; Deshacer</button>
+                        <button type="button" id="clear" class="btn btn-secondary btn-sm" title="{% trans 'Limpiar máscara' %}">&#128465; {% trans "Limpiar" %}</button>
+                        <button type="button" id="processBtn" class="btn btn-success btn-sm" title="{% trans 'Procesar imagen' %}">&#9881; {% trans "Procesar" %}</button>
+                        <button type="button" id="undoBtn" class="btn btn-secondary btn-sm" title="{% trans 'Deshacer último trazo' %}">&#8630; {% trans "Deshacer" %}</button>
                     </div>
                 </div>
                 <div class="field">
-                    <label style="margin-left:10px;">Fondo
+                    <label style="margin-left:10px;">{% trans "Fondo" %}
                         <span id="presetColors">
-                            <button type="button" class="bg-preset" data-color="transparent" style="background: repeating-linear-gradient(45deg,#ccc 0 8px,#fff 8px 16px);" title="Sin fondo">✕</button>
-                            <button type="button" class="bg-preset" data-color="#ffffff" style="background:#fff;" title="Blanco"></button>
-                            <button type="button" class="bg-preset" data-color="#000000" style="background:#000;" title="Negro"></button>
-                            <button type="button" class="bg-preset" data-color="#2563eb" style="background:#2563eb;" title="Azul"></button>
-                            <button type="button" class="bg-preset" data-color="#22c55e" style="background:#22c55e;" title="Verde"></button>
-                            <button type="button" class="bg-preset" data-color="#ef4444" style="background:#ef4444;" title="Rojo"></button>
+                            <button type="button" class="bg-preset" data-color="transparent" style="background: repeating-linear-gradient(45deg,#ccc 0 8px,#fff 8px 16px);" title="{% trans 'Sin fondo' %}">✕</button>
+                            <button type="button" class="bg-preset" data-color="#ffffff" style="background:#fff;" title="{% trans 'Blanco' %}"></button>
+                            <button type="button" class="bg-preset" data-color="#000000" style="background:#000;" title="{% trans 'Negro' %}"></button>
+                            <button type="button" class="bg-preset" data-color="#2563eb" style="background:#2563eb;" title="{% trans 'Azul' %}"></button>
+                            <button type="button" class="bg-preset" data-color="#22c55e" style="background:#22c55e;" title="{% trans 'Verde' %}"></button>
+                            <button type="button" class="bg-preset" data-color="#ef4444" style="background:#ef4444;" title="{% trans 'Rojo' %}"></button>
                         </span>
-                        <input type="color" id="bgColor" value="#ffffff" style="width:32px; height:32px; border:none; vertical-align:middle;" title="Color personalizado">
+                        <input type="color" id="bgColor" value="#ffffff" style="width:32px; height:32px; border:none; vertical-align:middle;" title="{% trans 'Color personalizado' %}">
                     </label>
                 </div>
             </div>
