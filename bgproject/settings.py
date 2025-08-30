@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Seguridad (solo para desarrollo, cambia en producción)
 SECRET_KEY = 'django-insecure-cambia-esto-en-produccion'
 DEBUG = True
-ALLOWED_HOSTS = ['cropix.site', 'www.cropix.site']
+ALLOWED_HOSTS = ['*','cropix.site', 'www.cropix.site']
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
@@ -107,9 +107,3 @@ CSRF_TRUSTED_ORIGINS = [
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-
-LANGUAGES = [
-    ('es', 'Español'),
-    ('en', 'English'),
-    # Agrega más si quieres, pero elimina o comenta 'de' si no tienes traducción
-]
