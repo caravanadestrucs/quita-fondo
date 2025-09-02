@@ -6,8 +6,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('bgremove.urls')),  # Importa las rutas de la app
 ]
-
-
-
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
