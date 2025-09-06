@@ -11,11 +11,11 @@ import base64
 
 # Ruta del modelo
 MODEL_DIR = Path.home() / ".u2net"
-MODEL_PATH = MODEL_DIR / "u2net.onnx"
-MODEL_URL = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2net.onnx"
+MODEL_PATH = MODEL_DIR / "u2netp.onnx"
+MODEL_URL = "https://github.com/danielgatis/rembg/releases/download/v0.0.0/u2netp.onnx"
 
 # Inicializamos la sesión global
-rembg_session = new_session("sam")
+rembg_session = new_session("u2netp")
 
 def load_model():
     global rembg_session
@@ -25,16 +25,16 @@ def load_model():
 
     # Descargar modelo si no está presente
     if not MODEL_PATH.exists():
-        print("Descargando modelo U2Net...")
+        print("Descargando modelo U2Netp...")
         resp = requests.get(MODEL_URL, stream=True)
         resp.raise_for_status()
         with open(MODEL_PATH, "wb") as f:
             for chunk in resp.iter_content(chunk_size=8192):
                 f.write(chunk)
-        print("Modelo descargado correctamente.")
+        print("Modelo U2Netp descargado correctamente.")
 
     # Cargar el modelo en memoria
-    rembg_session = new_session("u2net")
+    rembg_session = new_session("u2netp")
 
 # Cargamos el modelo al iniciar
 load_model()
@@ -141,3 +141,9 @@ def remove_background(request):
 
 def index(request):
     return render(request, "index.html")
+
+def privacy(request):
+    return render(request, "privacy.html")
+
+def terms(request):
+    return render(request, "terms.html")
