@@ -68,8 +68,9 @@
     }
     .canvas-wrap {
         position: relative;
-        width: 480px;
-        height: 480px;
+        width: 100%;
+        max-width: 480px;
+        aspect-ratio: 1 / 1;
         margin: 0 auto;
         background: #eef2ff;
         border-radius: 14px;
@@ -194,18 +195,129 @@
     .btn, .btn-secondary, .btn-success {
         border-radius: 8px;
         font-size: 16px;
-        padding: 8px 18px;
+        padding: 12px 20px; /* Aumentado para mejor touch */
         font-weight: 600;
         border: none;
         cursor: pointer;
         margin-right: 8px;
-        transition: background 0.2s;
+        margin-bottom: 8px; /* Para mobile stacking */
+        transition: background 0.2s, transform 0.1s;
+        min-height: 44px; /* iOS touch target minimum */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
     }
     .btn-secondary { background: #e5e7eb; color: #222; }
     .btn-success { background: #22c55e; color: #fff; }
-    .btn-secondary:hover { background: #d1d5db; }
-    .btn-success:hover { background: #16a34a; }
-    .btn:disabled { background: #f3f4f6; color: #aaa; cursor: not-allowed; }
+    .btn-secondary:hover { background: #d1d5db; transform: translateY(-1px); }
+    .btn-success:hover { background: #16a34a; transform: translateY(-1px); }
+    .btn:disabled { background: #f3f4f6; color: #aaa; cursor: not-allowed; transform: none; }
+    .btn:active { transform: translateY(0); }
+    
+    /* Mejoras touch-friendly */
+    .swatch {
+        width: 44px; /* Aumentado de 36px */
+        height: 44px;
+        border-radius: 50%;
+        border: 2px solid #2563eb;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #fff;
+        margin-right: 10px;
+        margin-bottom: 8px;
+        box-shadow: 0 2px 8px #2563eb22;
+        transition: border 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+    .swatch:hover, .swatch:focus { transform: scale(1.05); }
+    .swatch:active { transform: scale(0.95); }
+    
+    .bg-preset {
+        width: 36px; /* Aumentado de 28px */
+        height: 36px;
+        border: 2px solid #ccc;
+        border-radius: 50%;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        outline: none;
+        box-shadow: 0 2px 8px #2563eb11;
+        transition: border 0.2s, transform 0.1s;
+    }
+    .bg-preset:hover, .bg-preset:focus { transform: scale(1.1); }
+    .bg-preset:active { transform: scale(0.9); }
+    
+    /* Indicadores visuales mejorados */
+    .processing-indicator {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(37, 99, 235, 0.9);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        backdrop-filter: blur(8px);
+        z-index: 1000;
+        display: none;
+    }
+    
+    .loading-spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ffffff40;
+        border-top: 2px solid #ffffff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Tooltips mejorados */
+    .tooltip {
+        position: relative;
+        display: inline-block;
+    }
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 14px;
+        position: absolute;
+        z-index: 1000;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+    
+    /* Error states */
+    .error-state {
+        border: 2px solid #ef4444 !important;
+        background-color: #fef2f2 !important;
+    }
+    .success-state {
+        border: 2px solid #22c55e !important;
+        background-color: #f0fdf4 !important;
+    }
     #toaster {
         position:fixed;
         bottom:32px;
@@ -254,7 +366,7 @@
     }
     /* Responsive for mobile */
     @media (max-width: 600px) {
-        .canvas-wrap { width: 98vw; height: 60vw; min-height: 220px; }
+    .canvas-wrap { width: 98vw; aspect-ratio: auto; min-height: 220px; }
         canvas { border-radius: 8px; }
         .card { padding: 8px 2vw; }
         .download-row { flex-direction: column; gap: 8px; }
@@ -267,25 +379,27 @@
     <br>
     <br>
 </div>
+<main id="main" role="main" aria-labelledby="pageTitle">
 <div class="card" >
-    <h1>{% trans "Quita el fondo de tu imagen" %}</h1>
+    <h1 id="pageTitle">{% trans "Quita el fondo de tu imagen" %}</h1>
     <form id="form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="responsive-grid">
             <div>
                 <div class="upload-btn" id="uploadBtnWrap">
-                    <input id="image" type="file" name="image" accept="image/*">
-                    <label for="image" id="uploadLabel">{% trans "Subir imagen" %} <span id="fileName"></span></label>
+                    <input id="image" type="file" name="image" accept="image/*" aria-label="{% trans "Seleccionar imagen" %}">
+                    <label for="image" id="uploadLabel" role="button" aria-controls="canvas" aria-describedby="uploadHelp">{% trans "Subir imagen" %} <span id="fileName"></span></label>
+                    <div id="uploadHelp" class="visually-hidden">{% trans "Puedes arrastrar una imagen aquí, pegar desde el portapapeles o usar el botón para seleccionar un archivo." %}</div>
                 </div>
-                <div class="canvas-wrap" style="position:relative; width:480px; height:480px; margin:0 auto;">
-                    <canvas id="canvas" width="480" height="480" style="width:100%; height:100%;"></canvas>
+                <div class="canvas-wrap" style="position:relative; margin:0 auto;">
+                    <canvas id="canvas" width="480" height="480" style="width:100%; height:100%;" aria-label="Lienzo de edición" role="img"></canvas>
                     <div id="transitionCurtain" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#2563eb;opacity:0;pointer-events:none;z-index:2;transition:transform 0.7s cubic-bezier(.77,0,.18,1), opacity 0.3s; transform:translateX(-100%);">
                         <div id="progressBar">
                             <div id="progressFill"></div>
                         </div>
                     </div>
                 </div>
-                <div class="legend">
+                <div class="legend" id="legend">
                     <strong>{% trans "Pincel verde" %}</strong> = {% trans "conservar" %}, <strong>{% trans "pincel rojo" %}</strong> = {% trans "quitar fondo" %}.<br>
                     {% trans "Si no te gusta el resultado automático, usa los pinceles y haz clic en" %} <b>{% trans "Procesar" %}</b>.
                 </div>
@@ -293,16 +407,16 @@
             <div>
                 <div class="download-row" style="flex-direction:column;align-items:flex-start;gap:0;">
                     <div class="download-combo" style="display:flex;flex-direction:row;align-items:center;width:100%;">
-                        <button type="button" id="downloadBtn" disabled title="{% trans 'Descargar imagen' %}" style="border-radius:10px;flex:1 1 auto;min-width:160px;max-width:240px;font-size:18px;padding:12px 18px;display:flex;align-items:center;justify-content:center;gap:12px;">
+                        <button type="button" id="downloadBtn" disabled title="{% trans 'Descargar imagen' %}" style="border-radius:10px;flex:1 1 auto;min-width:160px;max-width:240px;font-size:18px;padding:12px 18px;display:flex;align-items:center;justify-content:center;gap:12px;" aria-label="{% trans 'Descargar imagen procesada' %}">
                             <span style="font-size:22px;">&#128190;</span>
                             <span>{% trans "Descargar" %}</span>
                         </button>
-                        <select id="formatSelect" title="{% trans 'Formato de descarga' %}" style="margin-left:-1px;border-radius:0;min-width:80px;font-size:16px;">
+                        <select id="formatSelect" title="{% trans 'Formato de descarga' %}" style="margin-left:-1px;border-radius:0;min-width:80px;font-size:16px;" aria-label="{% trans 'Formato de descarga' %}">
                             <option value="png">PNG</option>
                             <option value="webp">WebP</option>
                             <option value="svg">SVG</option>
                         </select>
-                        <select id="resolutionSelect" title="{% trans 'Resolución' %}" style="margin-left:-1px;border-radius:0 10px 10px 0;min-width:80px;font-size:16px;">
+                        <select id="resolutionSelect" title="{% trans 'Resolución' %}" style="margin-left:-1px;border-radius:0 10px 10px 0;min-width:80px;font-size:16px;" aria-label="{% trans 'Resolución de descarga' %}">
                             <option value="1">1x</option>
                             <option value="2">2x</option>
                             <option value="4">4x</option>
@@ -312,26 +426,68 @@
                 </div>
                 <div class="field">
                     <label>{% trans "Herramientas" %}</label>
-                    <div class="toolbar">
-                        <div class="swatch selected" data-color="keep" title="{% trans 'Conservar' %}">&#x2714;</div>
-                        <div class="swatch" data-color="remove" title="{% trans 'Quitar fondo' %}">&#x2716;</div>
-                        <label style="margin-left:10px;">{% trans "Grosor" %}
-                            <input id="size" type="range" min="5" max="80" value="24">
+                    <div class="toolbar" role="toolbar" aria-label="Herramientas de máscara">
+                        <div class="swatch selected" data-color="keep" title="{% trans 'Conservar' %}" role="button" tabindex="0" aria-pressed="true">&#x2714;</div>
+                        <div class="swatch" data-color="remove" title="{% trans 'Quitar fondo' %}" role="button" tabindex="0" aria-pressed="false">&#x2716;</div>
+                        <label style="margin-left:10px;">{% trans "Grosor" %} <span id="sizeValue">24</span>px
+                            <input id="size" type="range" min="5" max="80" value="24" aria-label="{% trans 'Grosor del pincel' %}">
                         </label>
-                        <button type="button" id="clear" class="btn btn-secondary btn-sm" title="{% trans 'Limpiar máscara' %}">&#128465; {% trans "Limpiar" %}</button>
-                        <button type="button" id="processBtn" class="btn btn-success btn-sm" title="{% trans 'Procesar imagen' %}">&#9881; {% trans "Procesar" %}</button>
-                        <button type="button" id="undoBtn" class="btn btn-secondary btn-sm" title="{% trans 'Deshacer último trazo' %}">&#8630; {% trans "Deshacer" %}</button>
+                        <button type="button" id="clear" class="btn btn-secondary btn-sm" title="{% trans 'Limpiar máscara' %}" aria-label="{% trans 'Limpiar máscara' %}">&#128465; {% trans "Limpiar" %}</button>
+                        <button type="button" id="processBtn" class="btn btn-success btn-sm" title="{% trans 'Procesar imagen' %}" aria-label="{% trans 'Procesar imagen' %}">&#9881; {% trans "Procesar" %}</button>
+                        <button type="button" id="undoBtn" class="btn btn-secondary btn-sm" title="{% trans 'Deshacer último trazo' %}" aria-label="{% trans 'Deshacer último trazo' %}">&#8630; {% trans "Deshacer" %}</button>
                     </div>
+                </div>
+                
+                <!-- Controles avanzados -->
+                <div class="field">
+                    <details>
+                        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 12px;">{% trans "Configuración avanzada" %}</summary>
+                        <div class="advanced-controls" style="padding: 16px; background: #f8fafc; border-radius: 8px; margin-top: 8px;">
+                            <div class="row" style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+                                <label style="flex: 1; min-width: 120px;">
+                                    {% trans "Modelo IA" %}
+                                    <select id="aiModel" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <option value="u2netp">CroPix Lite ({% trans "Rápido" %})</option>
+                                        <option value="u2net">CroPix Full ({% trans "Preciso" %})</option>
+                                        <option value="silueta">{% trans "Silueta" %} ({% trans "Simple" %})</option>
+                                    </select>
+                                </label>
+                                <label style="flex: 1; min-width: 120px;">
+                                    {% trans "Calidad" %}
+                                    <select id="quality" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <option value="fast">{% trans "Rápida" %}</option>
+                                        <option value="balanced" selected>{% trans "Equilibrada" %}</option>
+                                        <option value="high">{% trans "Alta" %}</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="row" style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-top: 12px;">
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="smoothEdges" checked>
+                                    {% trans "Suavizar bordes" %}
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="featherEdges">
+                                    {% trans "Difuminar bordes" %}
+                                </label>
+                                <label style="flex: 1; min-width: 120px;">
+                                    {% trans "Radio bordes" %}
+                                    <input type="range" id="edgeRadius" min="1" max="15" value="5" style="width: 100%;">
+                                    <span id="edgeRadiusValue">5</span>px
+                                </label>
+                            </div>
+                        </div>
+                    </details>
                 </div>
                 <div class="field">
                     <label style="margin-left:10px;">{% trans "Fondo" %}
                         <span id="presetColors">
-                            <button type="button" class="bg-preset" data-color="transparent" style="background: repeating-linear-gradient(45deg,#ccc 0 8px,#fff 8px 16px);" title="{% trans 'Sin fondo' %}">✕</button>
-                            <button type="button" class="bg-preset" data-color="#ffffff" style="background:#fff;" title="{% trans 'Blanco' %}"></button>
-                            <button type="button" class="bg-preset" data-color="#000000" style="background:#000;" title="{% trans 'Negro' %}"></button>
-                            <button type="button" class="bg-preset" data-color="#2563eb" style="background:#2563eb;" title="{% trans 'Azul' %}"></button>
-                            <button type="button" class="bg-preset" data-color="#22c55e" style="background:#22c55e;" title="{% trans 'Verde' %}"></button>
-                            <button type="button" class="bg-preset" data-color="#ef4444" style="background:#ef4444;" title="{% trans 'Rojo' %}"></button>
+                            <button type="button" class="bg-preset" data-color="transparent" style="background: repeating-linear-gradient(45deg,#ccc 0 8px,#fff 8px 16px);" title="{% trans 'Sin fondo' %}" role="button" tabindex="0" aria-pressed="false">✕</button>
+                            <button type="button" class="bg-preset" data-color="#ffffff" style="background:#fff;" title="{% trans 'Blanco' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                            <button type="button" class="bg-preset" data-color="#000000" style="background:#000;" title="{% trans 'Negro' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                            <button type="button" class="bg-preset" data-color="#2563eb" style="background:#2563eb;" title="{% trans 'Azul' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                            <button type="button" class="bg-preset" data-color="#22c55e" style="background:#22c55e;" title="{% trans 'Verde' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                            <button type="button" class="bg-preset" data-color="#ef4444" style="background:#ef4444;" title="{% trans 'Rojo' %}" role="button" tabindex="0" aria-pressed="false"></button>
                         </span>
                         <input type="color" id="bgColor" value="#ffffff" style="width:32px; height:32px; border:none; vertical-align:middle;" title="{% trans 'Color personalizado' %}">
                     </label>
@@ -343,6 +499,7 @@
     </form>
     <div id="status" class="hint" style="margin-top:12px;"></div>
 </div>
+</main>
 
 <div id="toaster"></div>
 
@@ -367,6 +524,119 @@ const toaster = document.getElementById('toaster');
 const progressBar = document.getElementById('progressBar');
 const progressFill = document.getElementById('progressFill');
 
+// Accessibility live region for screen readers
+const statusRegion = document.getElementById('status');
+if (statusRegion) {
+    statusRegion.setAttribute('role', 'status');
+    statusRegion.setAttribute('aria-live', 'polite');
+}
+function showStatus(msg) { if (statusRegion) statusRegion.textContent = msg; }
+
+// Elementos de configuración avanzada
+const aiModelSelect = document.getElementById('aiModel');
+const qualitySelect = document.getElementById('quality');
+const smoothEdgesCheck = document.getElementById('smoothEdges');
+const featherEdgesCheck = document.getElementById('featherEdges');
+const edgeRadiusSlider = document.getElementById('edgeRadius');
+const edgeRadiusValue = document.getElementById('edgeRadiusValue');
+const sizeValue = document.getElementById('sizeValue');
+
+// Actualizar valores en tiempo real
+sizeInput.addEventListener('input', () => {
+    sizeValue.textContent = sizeInput.value;
+});
+
+edgeRadiusSlider.addEventListener('input', () => {
+    edgeRadiusValue.textContent = edgeRadiusSlider.value;
+});
+
+// Paste support: allow users to paste images from clipboard
+window.addEventListener('paste', (ev) => {
+    const clipboard = (ev.clipboardData || window.clipboardData);
+    if (!clipboard) return;
+    const items = clipboard.items || [];
+    for (let i=0;i<items.length;i++){
+        const it = items[i];
+        if (it.kind === 'file' && it.type.indexOf('image') === 0) {
+            const file = it.getAsFile();
+            if (file) {
+                const dt = new DataTransfer(); dt.items.add(file);
+                fileInput.files = dt.files;
+                fileInput.dispatchEvent(new Event('change'));
+                showStatus('{% trans "Imagen pegada desde el portapapeles" %}');
+                showToaster('{% trans "Imagen pegada desde el portapapeles" %}', '#22c55e');
+            }
+            ev.preventDefault();
+            return;
+        }
+    }
+});
+
+// Validación de archivos mejorada
+function validateFile(file) {
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/bmp'];
+    
+    if (file.size > maxSize) {
+        showToaster('{% trans "Archivo demasiado grande. Máximo 10MB." %}', '#ef4444');
+        showStatus('{% trans "Error: Archivo demasiado grande" %}');
+        return false;
+    }
+    
+    if (!allowedTypes.includes(file.type)) {
+        showToaster('{% trans "Formato no soportado. Use JPG, PNG, WebP o BMP." %}', '#ef4444');
+        showStatus('{% trans "Error: Formato no soportado" %}');
+        return false;
+    }
+    
+    return true;
+}
+
+// Keyboard navigation para swatches y presets
+function setupKeyboardNavigation() {
+    document.querySelectorAll('.swatch, .bg-preset').forEach(el => {
+        el.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                ev.preventDefault();
+                el.click();
+            }
+        });
+    });
+}
+
+// Indicador de procesamiento mejorado
+function createProcessingIndicator() {
+    const indicator = document.createElement('div');
+    indicator.className = 'processing-indicator';
+    indicator.innerHTML = `
+        <div style="display: flex; align-items: center;">
+            <div class="loading-spinner"></div>
+            <span id="processing-text">{% trans "Procesando imagen..." %}</span>
+        </div>
+        <div style="font-size: 14px; opacity: 0.8; margin-top: 4px;" id="processing-detail"></div>
+    `;
+    return indicator;
+}
+
+let processingIndicator = null;
+
+function showProcessingIndicator(text = '{% trans "Procesando imagen..." %}', detail = '') {
+    if (!processingIndicator) {
+        processingIndicator = createProcessingIndicator();
+        document.querySelector('.canvas-wrap').appendChild(processingIndicator);
+    }
+    
+    document.getElementById('processing-text').textContent = text;
+    document.getElementById('processing-detail').textContent = detail;
+    processingIndicator.style.display = 'block';
+}
+
+function hideProcessingIndicator() {
+    if (processingIndicator) {
+        processingIndicator.style.display = 'none';
+    }
+}
+
 let currentBgColor = "#ffffff";
 let brush = 'keep';
 let drawing = false;
@@ -379,10 +649,26 @@ let maskHistory = [];
 const drawLayer = document.createElement('canvas');
 const drawCtx = drawLayer.getContext('2d');
 
-// Mostrar nombre de archivo subido
+// Mostrar nombre de archivo subido con validación
 fileInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
-    fileNameSpan.textContent = file ? file.name : '';
+    if (!file) {
+        fileNameSpan.textContent = '';
+        return;
+    }
+    
+    if (!validateFile(file)) {
+        fileInput.value = ''; // Limpiar input si es inválido
+        fileNameSpan.textContent = '';
+        return;
+    }
+    
+    fileNameSpan.textContent = file.name;
+    
+    // Mostrar información del archivo
+    const sizeKB = Math.round(file.size / 1024);
+    const sizeText = sizeKB > 1024 ? `${(sizeKB/1024).toFixed(1)}MB` : `${sizeKB}KB`;
+    showStatus(`{% trans "Archivo cargado" %}: ${file.name} (${sizeText})`);
 });
 
 // Fondo preestablecido y personalizado
@@ -413,27 +699,62 @@ uploadBtnWrap.addEventListener('drop', e => {
     }
 });
 
-// Carga imagen y procesamiento automático
+// Carga imagen y procesamiento automático mejorado
 fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file || !validateFile(file)) return;
+    
     showCurtain();
     showProgressBar();
+    showProcessingIndicator('{% trans "Cargando imagen..." %}', `${file.name}`);
+    
     const reader = new FileReader();
     reader.onload = function(ev) {
         const img = new Image();
         img.onload = function() {
+            // Validar dimensiones
+            if (img.width > 3072 || img.height > 3072) {
+                hideCurtain();
+                hideProcessingIndicator();
+                showToaster('{% trans "Imagen demasiado grande. Máximo 3072x3072 píxeles." %}', "#ef4444");
+                showStatus('{% trans "Error: Imagen demasiado grande" %}');
+                return;
+            }
+            
+            if (img.width < 8 || img.height < 8) {
+                hideCurtain();
+                hideProcessingIndicator();
+                showToaster('{% trans "Imagen demasiado pequeña. Mínimo 8x8 píxeles." %}', "#ef4444");
+                showStatus('{% trans "Error: Imagen demasiado pequeña" %}');
+                return;
+            }
+            
             imgBitmap = img;
             originalImg = img;
             setCanvasSize(img.width, img.height);
             render();
             uploadBtnWrap.style.display = 'none';
-            showToaster('Procesando imagen automáticamente...');
+            
+            showProcessingIndicator('{% trans "Procesando imagen automáticamente..." %}', `${img.width}x${img.height} píxeles`);
+            showStatus('{% trans "Procesando imagen automáticamente..." %}');
+            
             setTimeout(() => {
                 processBtn.click();
             }, 100);
         };
+        img.onerror = function() {
+            hideCurtain();
+            hideProcessingIndicator();
+            showToaster('{% trans "Error al cargar la imagen" %}', "#ef4444");
+            showStatus('{% trans "Error: No se pudo cargar la imagen" %}');
+        };
         img.src = ev.target.result;
+    };
+    reader.onerror = function() {
+        hideCurtain();
+        hideProcessingIndicator();
+        showToaster('{% trans "Error al leer el archivo" %}', "#ef4444");
+        showStatus('{% trans "Error: No se pudo leer el archivo" %}');
     };
     reader.readAsDataURL(file);
 });
@@ -497,18 +818,56 @@ canvas.addEventListener('touchmove', (e) => { if (!drawing) return; const p = ge
 
 document.querySelectorAll('.swatch').forEach(el => {
     el.addEventListener('click', () => {
-        document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+        document.querySelectorAll('.swatch').forEach(s => {
+            s.classList.remove('selected');
+            s.setAttribute('aria-pressed', 'false');
+        });
         el.classList.add('selected');
+        el.setAttribute('aria-pressed', 'true');
         brush = el.dataset.color;
+        
+        // Feedback visual
+        showStatus(`{% trans "Pincel seleccionado" %}: ${brush === 'keep' ? '{% trans "Conservar" %}' : '{% trans "Quitar fondo" %}'}`);
     });
 });
 
+// Fondo preestablecido y personalizado con navegación por teclado
+document.querySelectorAll('.bg-preset').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.bg-preset').forEach(b => {
+            b.classList.remove('selected');
+            b.setAttribute('aria-pressed', 'false');
+        });
+        btn.classList.add('selected');
+        btn.setAttribute('aria-pressed', 'true');
+        currentBgColor = btn.dataset.color;
+        bgColorInput.value = currentBgColor === "transparent" ? "#ffffff" : currentBgColor;
+        if (lastResultImg) drawResultOnCanvas(lastResultDataUrl);
+        
+        // Feedback
+        const colorName = btn.title || btn.dataset.color;
+        showStatus(`{% trans "Fondo seleccionado" %}: ${colorName}`);
+    });
+});
+
+bgColorInput.addEventListener('input', function() {
+    currentBgColor = bgColorInput.value;
+    document.querySelectorAll('.bg-preset').forEach(b => {
+        b.classList.remove('selected');
+        b.setAttribute('aria-pressed', 'false');
+    });
+    if (lastResultImg) drawResultOnCanvas(lastResultDataUrl);
+    showStatus(`{% trans "Color de fondo personalizado" %}: ${currentBgColor}`);
+});
+
 clearBtn.addEventListener('click', () => {
-    if (confirm("¿Seguro que quieres limpiar la máscara?")) {
+    if (confirm('{% trans "¿Seguro que quieres limpiar la máscara?" %}')) {
         drawCtx.clearRect(0, 0, drawLayer.width, drawLayer.height);
         dirty = false;
         maskHistory = [];
         render();
+        showStatus('{% trans "Máscara limpiada" %}');
+        showToaster('{% trans "Máscara limpiada" %}', '#22c55e');
     }
 });
 
@@ -516,13 +875,121 @@ undoBtn.addEventListener('click', () => {
     if (maskHistory.length) {
         drawCtx.putImageData(maskHistory.pop(), 0, 0);
         render();
+        showStatus(`{% trans "Deshacer aplicado" %}. {% trans "Pasos restantes" %}: ${maskHistory.length}`);
+        showToaster('{% trans "Trazo deshecho" %}', '#22c55e');
+    } else {
+        showStatus('{% trans "No hay acciones para deshacer" %}');
+        showToaster('{% trans "No hay acciones para deshacer" %}', '#f59e0b');
     }
 });
 
-// Atajos de teclado
+// Setup keyboard navigation
+setupKeyboardNavigation();
+
+// Atajos de teclado mejorados
 document.addEventListener('keydown', e => {
-    if (e.ctrlKey && e.key === 'z') { undoBtn.click(); }
-    if (e.ctrlKey && e.key === 'l') { clearBtn.click(); }
+    // Solo aplicar atajos cuando no hay inputs enfocados
+    if (document.activeElement.tagName === 'INPUT' || 
+        document.activeElement.tagName === 'SELECT' || 
+        document.activeElement.tagName === 'TEXTAREA') {
+        return;
+    }
+    
+    if (e.ctrlKey || e.metaKey) {
+        switch(e.key) {
+            case 'z':
+                e.preventDefault();
+                undoBtn.click();
+                break;
+            case 'l':
+                e.preventDefault();
+                clearBtn.click();
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (!processBtn.disabled) processBtn.click();
+                break;
+            case 's':
+                e.preventDefault();
+                if (!downloadBtn.disabled) downloadBtn.click();
+                break;
+        }
+    } else {
+        switch(e.key) {
+            case '1':
+                document.querySelector('.swatch[data-color="keep"]').click();
+                break;
+            case '2':
+                document.querySelector('.swatch[data-color="remove"]').click();
+                break;
+            case 'Escape':
+                if (drawing) {
+                    drawing = false;
+                    showToaster('{% trans "Dibujo cancelado" %}', '#f59e0b');
+                }
+                break;
+        }
+    }
+});
+
+// Tooltip helper para mostrar atajos
+function addKeyboardTooltips() {
+    const tooltips = {
+        'undoBtn': 'Ctrl+Z',
+        'clearBtn': 'Ctrl+L',
+        'processBtn': 'Ctrl+Enter',
+        'downloadBtn': 'Ctrl+S'
+    };
+    
+    Object.entries(tooltips).forEach(([id, shortcut]) => {
+        const el = document.getElementById(id);
+        if (el) {
+            const originalTitle = el.title;
+            el.title = `${originalTitle} (${shortcut})`;
+        }
+    });
+}
+
+// Inicializar tooltips y funcionalidades
+document.addEventListener('DOMContentLoaded', () => {
+    addKeyboardTooltips();
+    setupKeyboardNavigation();
+    
+    // Mostrar ayuda inicial
+    showStatus('{% trans "Arrastra una imagen aquí, pégala con Ctrl+V, o haz clic para seleccionar" %}');
+});
+
+// Mejorar el drag and drop con feedback visual
+uploadBtnWrap.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    uploadBtnWrap.classList.add('drag-over');
+    uploadBtnWrap.style.background = "#dbeafe";
+    uploadBtnWrap.style.transform = "scale(1.02)";
+});
+
+uploadBtnWrap.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    if (!uploadBtnWrap.contains(e.relatedTarget)) {
+        uploadBtnWrap.classList.remove('drag-over');
+        uploadBtnWrap.style.background = "";
+        uploadBtnWrap.style.transform = "";
+    }
+});
+
+uploadBtnWrap.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadBtnWrap.classList.remove('drag-over');
+    uploadBtnWrap.style.background = "";
+    uploadBtnWrap.style.transform = "";
+    
+    if (e.dataTransfer.files.length) {
+        const file = e.dataTransfer.files[0];
+        if (validateFile(file)) {
+            fileInput.files = e.dataTransfer.files;
+            fileInput.dispatchEvent(new Event('change'));
+            showToaster('{% trans "Archivo cargado correctamente" %}', '#22c55e');
+        }
+    }
 });
 
 // Cortina y barra de progreso
@@ -556,11 +1023,32 @@ function hideProgressBar() {
     progressFill.style.width = "0";
 }
 
-// Procesar imagen
+// Procesar imagen con configuración completa
 processBtn.addEventListener('click', () => {
-    if (!imgBitmap) return;
+    if (!imgBitmap) {
+        showToaster('{% trans "Primero selecciona una imagen" %}', '#ef4444');
+        showStatus('{% trans "Error: No hay imagen para procesar" %}');
+        return;
+    }
+    
     showCurtain();
     showProgressBar();
+    
+    const aiModel = aiModelSelect.value;
+    const quality = qualitySelect.value;
+    
+    // Mostrar información del procesamiento
+    let processingText = '{% trans "Procesando imagen" %}...';
+    let modelName = aiModel === 'u2netp' ? 'CroPix Lite' : 
+                   aiModel === 'u2net' ? 'CroPix Full' : 
+                   '{% trans "Silueta" %}';
+    let qualityName = quality === 'fast' ? '{% trans "Rápida" %}' : 
+                     quality === 'high' ? '{% trans "Alta" %}' : 
+                     '{% trans "Equilibrada" %}';
+    
+    showProcessingIndicator(processingText, `${modelName} - ${qualityName}`);
+    showStatus(`{% trans "Procesando con" %} ${modelName} (${qualityName})`);
+    
     let maskData = '';
     if (dirty) {
         maskData = drawLayer.toDataURL('image/png');
@@ -574,6 +1062,16 @@ function processImage(file, maskData) {
     fd.append('image', file);
     if (maskData) fd.append('mask_data', maskData);
     fd.append('mode', 'keep_subject');
+    
+    // Configuraciones avanzadas del backend
+    fd.append('ai_model', aiModelSelect.value);
+    fd.append('quality', qualitySelect.value);
+    fd.append('smooth_edges', smoothEdgesCheck.checked ? 'true' : 'false');
+    fd.append('feather_edges', featherEdgesCheck.checked ? 'true' : 'false');
+    fd.append('edge_radius', edgeRadiusSlider.value);
+    
+    const startTime = Date.now();
+    
     fetch('/api/remove/', {
         method: 'POST',
         headers: {
@@ -583,23 +1081,46 @@ function processImage(file, maskData) {
     })
     .then(resp => resp.json())
     .then( data => {
+        const processingTime = Date.now() - startTime;
         hideCurtain();
+        hideProcessingIndicator();
+        
         if(!data.success){
-            showToaster('Error: ' + (data.error || 'desconocido'), "#ef4444");
+            const errorMsg = data.error || '{% trans "Error desconocido" %}';
+            showToaster(`{% trans "Error" %}: ${errorMsg}`, "#ef4444");
+            showStatus(`{% trans "Error en procesamiento" %}: ${errorMsg}`);
             downloadBtn.disabled = true;
             render();
         } else {
             lastResultDataUrl = data.image_data;
             drawResultOnCanvas(data.image_data);
             downloadBtn.disabled = false;
-            showToaster('Procesamiento exitoso');
+            
+            const timeText = processingTime > 1000 ? 
+                `${(processingTime/1000).toFixed(1)}s` : 
+                `${processingTime}ms`;
+            
+            showToaster('{% trans "¡Procesamiento exitoso!" %}', '#22c55e');
+            showStatus(`{% trans "Procesamiento completado en" %} ${timeText}. ${data.result_size.width}x${data.result_size.height} píxeles`);
+            
+            // Log para debug (opcional)
+            console.log('Processing completed:', {
+                time: timeText,
+                settings: data.settings_used,
+                originalSize: data.original_size,
+                resultSize: data.result_size
+            });
         }
     })
-    .catch(() => {
+    .catch((error) => {
         hideCurtain();
-        showToaster('Error de red.', "#ef4444");
+        hideProcessingIndicator();
+        const msg = '{% trans "Error de conexión. Verifica tu internet." %}';
+        showToaster(msg, "#ef4444");
+        showStatus(msg);
         downloadBtn.disabled = true;
         render();
+        console.error('Processing error:', error);
     });
 }
 
