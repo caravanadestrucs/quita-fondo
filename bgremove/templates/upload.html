@@ -479,18 +479,28 @@
                         </div>
                     </details>
                 </div>
+                <!-- Controles avanzados -->
                 <div class="field">
-                    <label style="margin-left:10px;">{% trans "Fondo" %}
-                        <span id="presetColors">
-                            <button type="button" class="bg-preset" data-color="transparent" style="background: repeating-linear-gradient(45deg,#ccc 0 8px,#fff 8px 16px);" title="{% trans 'Sin fondo' %}" role="button" tabindex="0" aria-pressed="false">✕</button>
-                            <button type="button" class="bg-preset" data-color="#ffffff" style="background:#fff;" title="{% trans 'Blanco' %}" role="button" tabindex="0" aria-pressed="false"></button>
-                            <button type="button" class="bg-preset" data-color="#000000" style="background:#000;" title="{% trans 'Negro' %}" role="button" tabindex="0" aria-pressed="false"></button>
-                            <button type="button" class="bg-preset" data-color="#2563eb" style="background:#2563eb;" title="{% trans 'Azul' %}" role="button" tabindex="0" aria-pressed="false"></button>
-                            <button type="button" class="bg-preset" data-color="#22c55e" style="background:#22c55e;" title="{% trans 'Verde' %}" role="button" tabindex="0" aria-pressed="false"></button>
-                            <button type="button" class="bg-preset" data-color="#ef4444" style="background:#ef4444;" title="{% trans 'Rojo' %}" role="button" tabindex="0" aria-pressed="false"></button>
-                        </span>
-                        <input type="color" id="bgColor" value="#ffffff" style="width:32px; height:32px; border:none; vertical-align:middle;" title="{% trans 'Color personalizado' %}">
-                    </label>
+                    <details>
+                        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 12px;">{% trans "Fondos Solidos" %}</summary>
+                        <div class="advanced-controls" style="padding: 16px; background: #f8fafc; border-radius: 8px; margin-top: 8px;">
+                            <div class="row" style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+                            </div>
+                            <div class="row" style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-top: 12px;">
+                                <label style="margin-left:10px;">{% trans "Fondo" %}
+                                <span id="presetColors">
+                                    <button type="button" class="bg-preset" data-color="transparent" style="background: repeating-linear-gradient(45deg,#ccc 0 8px,#fff 8px 16px);" title="{% trans 'Sin fondo' %}" role="button" tabindex="0" aria-pressed="false">✕</button>
+                                    <button type="button" class="bg-preset" data-color="#ffffff" style="background:#fff;" title="{% trans 'Blanco' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                                    <button type="button" class="bg-preset" data-color="#000000" style="background:#000;" title="{% trans 'Negro' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                                    <button type="button" class="bg-preset" data-color="#2563eb" style="background:#2563eb;" title="{% trans 'Azul' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                                    <button type="button" class="bg-preset" data-color="#22c55e" style="background:#22c55e;" title="{% trans 'Verde' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                                    <button type="button" class="bg-preset" data-color="#ef4444" style="background:#ef4444;" title="{% trans 'Rojo' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                                </span>
+                                <input type="color" id="bgColor" value="#ffffff" style="width:32px; height:32px; border:none; vertical-align:middle;" title="{% trans 'Color personalizado' %}">
+                            </label>
+                            </div>
+                        </div>
+                    </details>
                 </div>
             </div>
         </div>
