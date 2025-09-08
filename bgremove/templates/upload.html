@@ -1009,8 +1009,9 @@ document.querySelectorAll('.bg-preset').forEach(btn => {
         });
         btn.classList.add('selected');
         btn.setAttribute('aria-pressed', 'true');
-        currentBgColor = btn.dataset.color;
-        currentBackgroundType = 'solid';
+    currentBgColor = btn.dataset.color;
+    currentBackgroundType = 'solid';
+    backgroundSelected = true;
         bgColorInput.value = currentBgColor === "transparent" ? "#ffffff" : currentBgColor;
         
         // Limpiar selección de fondos con imagen
@@ -1031,6 +1032,7 @@ document.querySelectorAll('.bg-preset').forEach(btn => {
 bgColorInput.addEventListener('input', function() {
     currentBgColor = bgColorInput.value;
     currentBackgroundType = 'solid';
+    backgroundSelected = true;
     document.querySelectorAll('.bg-preset').forEach(b => {
         b.classList.remove('selected');
         b.setAttribute('aria-pressed', 'false');
@@ -1373,6 +1375,13 @@ downloadBtn.addEventListener('click', () => {
         }
     }
 
+    // Si el usuario NO seleccionó ningún fondo explícitamente, exportamos con transparencia
+    if (!backgroundSelected) {
+        exportCtx.drawImage(lastResultImg, 0, 0, w, h);
+        emitExport();
+        return;
+    }
+
     // Dibujar fondo según tipo seleccionado
     if (currentBackgroundType === 'solid') {
         if (currentBgColor !== "transparent") {
@@ -1501,6 +1510,8 @@ function downloadBlob(url, filename) {
 // === FUNCIONALIDAD DE FONDOS CON IMAGEN ===
 let currentBackgroundImage = null;
 let currentBackgroundType = 'solid';
+// Indica si el usuario seleccionó explícitamente un fondo (solid/image/gradient/pattern)
+let backgroundSelected = false;
 let backgroundScale = 'cover';
 let backgroundPosition = 'center center';
 let backgroundOpacity = 1;
@@ -1642,6 +1653,7 @@ backgroundGallery.addEventListener('click', (e) => {
 function selectBackgroundImage(element, imageUrl) {
     currentBackgroundImage = imageUrl;
     currentBackgroundType = 'image';
+    backgroundSelected = true;
     bgDrawToken++;
     
     // Aplicar fondo si hay resultado
@@ -1656,6 +1668,7 @@ function selectBackgroundGradient(element) {
     const gradientStyle = element.style.background;
     currentBackgroundImage = gradientStyle;
     currentBackgroundType = 'gradient';
+    backgroundSelected = true;
     bgDrawToken++;
     
     if (lastResultImg) {
@@ -1669,6 +1682,7 @@ function selectBackgroundPattern(element) {
     const patternStyle = element.style.background;
     currentBackgroundImage = patternStyle;
     currentBackgroundType = 'pattern';
+    backgroundSelected = true;
     bgDrawToken++;
     
     if (lastResultImg) {
