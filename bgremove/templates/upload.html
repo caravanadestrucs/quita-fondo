@@ -371,6 +371,99 @@
         .card { padding: 8px 2vw; }
         .download-row { flex-direction: column; gap: 8px; }
     }
+    
+    /* Estilos para fondos con imagen */
+    .background-image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 8px;
+        margin-top: 12px;
+    }
+    
+    .bg-image-preset {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: border-color 0.2s, transform 0.1s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .bg-image-preset:hover {
+        transform: scale(1.05);
+    }
+    
+    .bg-image-preset.selected {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px #2563eb33;
+    }
+    
+    .bg-image-preset.upload-slot {
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: #64748b;
+        border: 2px dashed #cbd5e1;
+    }
+    
+    .bg-image-preset.upload-slot:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+    }
+    
+    .background-controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .bg-scale-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .bg-position-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .position-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 20px);
+        grid-template-rows: repeat(3, 20px);
+        gap: 2px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        padding: 4px;
+    }
+    
+    .position-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 2px;
+        background: #e5e7eb;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .position-dot:hover {
+        background: #cbd5e1;
+    }
+    
+    .position-dot.active {
+        background: #2563eb;
+    }
 </style>
 {% endblock %}
 
@@ -482,7 +575,7 @@
                 <!-- Controles avanzados -->
                 <div class="field">
                     <details>
-                        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 12px;">{% trans "Fondos Solidos" %}</summary>
+                        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 12px;">{% trans "Fondos Sólidos" %}</summary>
                         <div class="advanced-controls" style="padding: 16px; background: #f8fafc; border-radius: 8px; margin-top: 8px;">
                             <div class="row" style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
                             </div>
@@ -499,6 +592,63 @@
                                 <input type="color" id="bgColor" value="#ffffff" style="width:32px; height:32px; border:none; vertical-align:middle;" title="{% trans 'Color personalizado' %}">
                             </label>
                             </div>
+                        </div>
+                    </details>
+                </div>
+                
+                <!-- Fondos con Imagen -->
+                <div class="field">
+                    <details>
+                        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 12px;">{% trans "Fondos con Imagen" %}</summary>
+                        <div class="advanced-controls" style="padding: 16px; background: #f8fafc; border-radius: 8px; margin-top: 8px;">
+                            <div class="background-image-gallery" id="backgroundGallery">
+                                <!-- Slot para subir nueva imagen -->
+                                <div class="bg-image-preset upload-slot" id="uploadBackgroundSlot" title="{% trans 'Subir imagen de fondo' %}">
+                                    &#43;
+                                </div>
+                                <!-- Presets predeterminados -->
+                                <div class="bg-image-preset" data-bg-type="gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="{% trans 'Gradiente azul-púrpura' %}"></div>
+                                <div class="bg-image-preset" data-bg-type="gradient" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" title="{% trans 'Gradiente rosa-rojo' %}"></div>
+                                <div class="bg-image-preset" data-bg-type="gradient" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);" title="{% trans 'Gradiente azul-cian' %}"></div>
+                                <div class="bg-image-preset" data-bg-type="gradient" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);" title="{% trans 'Gradiente verde-rosa suave' %}"></div>
+                                <div class="bg-image-preset" data-bg-type="pattern" style="background: repeating-linear-gradient(45deg, #f8f9fa 0px, #f8f9fa 10px, #e9ecef 10px, #e9ecef 20px);" title="{% trans 'Patrón de rayas' %}"></div>
+                                <div class="bg-image-preset" data-bg-type="pattern" style="background: radial-gradient(circle at 25% 25%, #f8f9fa 2px, transparent 2px), radial-gradient(circle at 75% 75%, #e9ecef 2px, transparent 2px); background-size: 20px 20px;" title="{% trans 'Patrón de puntos' %}"></div>
+                            </div>
+                            
+                            <div class="background-controls">
+                                <div class="bg-scale-control">
+                                    <label style="font-size: 14px;">{% trans "Escala" %}:</label>
+                                    <select id="backgroundScale" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #d1d5db;">
+                                        <option value="cover">{% trans "Cubrir" %}</option>
+                                        <option value="contain">{% trans "Contener" %}</option>
+                                        <option value="fill">{% trans "Rellenar" %}</option>
+                                        <option value="repeat">{% trans "Repetir" %}</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="bg-position-control">
+                                    <label style="font-size: 14px;">{% trans "Posición" %}:</label>
+                                    <div class="position-grid" id="positionGrid">
+                                        <div class="position-dot" data-position="top left"></div>
+                                        <div class="position-dot" data-position="top center"></div>
+                                        <div class="position-dot" data-position="top right"></div>
+                                        <div class="position-dot" data-position="center left"></div>
+                                        <div class="position-dot active" data-position="center center"></div>
+                                        <div class="position-dot" data-position="center right"></div>
+                                        <div class="position-dot" data-position="bottom left"></div>
+                                        <div class="position-dot" data-position="bottom center"></div>
+                                        <div class="position-dot" data-position="bottom right"></div>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <label style="font-size: 14px;">{% trans "Opacidad" %}:</label>
+                                    <input type="range" id="backgroundOpacity" min="0.1" max="1" step="0.1" value="1" style="width: 80px;">
+                                    <span id="opacityValue">100%</span>
+                                </div>
+                            </div>
+                            
+                            <input type="file" id="backgroundImageInput" accept="image/*" style="display: none;">
                         </div>
                     </details>
                 </div>
@@ -851,7 +1001,16 @@ document.querySelectorAll('.bg-preset').forEach(btn => {
         btn.classList.add('selected');
         btn.setAttribute('aria-pressed', 'true');
         currentBgColor = btn.dataset.color;
+        currentBackgroundType = 'solid';
         bgColorInput.value = currentBgColor === "transparent" ? "#ffffff" : currentBgColor;
+        
+        // Limpiar selección de fondos con imagen
+        if (backgroundGallery) {
+            backgroundGallery.querySelectorAll('.bg-image-preset').forEach(el => {
+                if (el !== uploadBackgroundSlot) el.classList.remove('selected');
+            });
+        }
+        
         if (lastResultImg) drawResultOnCanvas(lastResultDataUrl);
         
         // Feedback
@@ -862,10 +1021,19 @@ document.querySelectorAll('.bg-preset').forEach(btn => {
 
 bgColorInput.addEventListener('input', function() {
     currentBgColor = bgColorInput.value;
+    currentBackgroundType = 'solid';
     document.querySelectorAll('.bg-preset').forEach(b => {
         b.classList.remove('selected');
         b.setAttribute('aria-pressed', 'false');
     });
+    
+    // Limpiar selección de fondos con imagen
+    if (backgroundGallery) {
+        backgroundGallery.querySelectorAll('.bg-image-preset').forEach(el => {
+            if (el !== uploadBackgroundSlot) el.classList.remove('selected');
+        });
+    }
+    
     if (lastResultImg) drawResultOnCanvas(lastResultDataUrl);
     showStatus(`{% trans "Color de fondo personalizado" %}: ${currentBgColor}`);
 });
@@ -1142,11 +1310,18 @@ function drawResultOnCanvas(dataURL){
         canvas.width = w;
         canvas.height = h;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (currentBgColor !== "transparent") {
-            ctx.fillStyle = currentBgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Usar sistema unificado de fondos
+        if (currentBackgroundType === 'solid') {
+            if (currentBgColor !== "transparent") {
+                ctx.fillStyle = currentBgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            ctx.drawImage(img, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+        } else {
+            // Usar sistema de fondos con imagen
+            drawResultWithBackground();
         }
-        ctx.drawImage(img, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
     };
     img.src = dataURL;
 }
@@ -1200,5 +1375,428 @@ function downloadBlob(url, filename) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     document.body.removeChild(a);
 }
+
+// === FUNCIONALIDAD DE FONDOS CON IMAGEN ===
+let currentBackgroundImage = null;
+let currentBackgroundType = 'solid';
+let backgroundScale = 'cover';
+let backgroundPosition = 'center center';
+let backgroundOpacity = 1;
+
+// Token para invalidar dibujados asíncronos antiguos (evita que un onload previo sobreescriba)
+let bgDrawToken = 0;
+
+// Variables para almacenar imágenes de fondo subidas
+const uploadedBackgrounds = [];
+
+// Input de archivo para fondos
+const backgroundImageInput = document.getElementById('backgroundImageInput');
+const uploadBackgroundSlot = document.getElementById('uploadBackgroundSlot');
+const backgroundGallery = document.getElementById('backgroundGallery');
+const backgroundScaleSelect = document.getElementById('backgroundScale');
+const positionGrid = document.getElementById('positionGrid');
+const backgroundOpacitySlider = document.getElementById('backgroundOpacity');
+const opacityValue = document.getElementById('opacityValue');
+
+// Manejar clic en slot de subida
+uploadBackgroundSlot.addEventListener('click', () => {
+    backgroundImageInput.click();
+});
+
+// Manejar subida de archivo
+backgroundImageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (!validateFile(file)) return;
+    
+    showProcessingIndicator('{% trans "Cargando imagen de fondo..." %}');
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+            // Crear thumbnail para la galería
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 80;
+            canvas.height = 80;
+            
+            // Calcular escalado para mantener aspecto
+            const scale = Math.min(80 / img.width, 80 / img.height);
+            const width = img.width * scale;
+            const height = img.height * scale;
+            const x = (80 - width) / 2;
+            const y = (80 - height) / 2;
+            
+            ctx.clearRect(0, 0, 80, 80);
+            ctx.drawImage(img, x, y, width, height);
+            
+            const thumbnailDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Agregar a la lista de fondos subidos
+            const backgroundData = {
+                original: event.target.result,
+                thumbnail: thumbnailDataUrl,
+                name: file.name
+            };
+            uploadedBackgrounds.push(backgroundData);
+            
+            // Crear elemento en la galería
+            const bgElement = document.createElement('div');
+            bgElement.className = 'bg-image-preset';
+            bgElement.style.backgroundImage = `url(${thumbnailDataUrl})`;
+            bgElement.style.backgroundSize = 'cover';
+            bgElement.style.backgroundPosition = 'center';
+            bgElement.title = file.name;
+            bgElement.dataset.bgType = 'uploaded';
+            bgElement.dataset.bgIndex = uploadedBackgrounds.length - 1;
+            
+            // Insertar antes del slot de subida
+            backgroundGallery.insertBefore(bgElement, uploadBackgroundSlot);
+            
+            // Auto-seleccionar la nueva imagen
+            selectBackgroundImage(bgElement, backgroundData.original);
+            
+            hideProcessingIndicator();
+            showToaster('{% trans "Imagen de fondo cargada exitosamente" %}', '#22c55e');
+        };
+        img.onerror = () => {
+            hideProcessingIndicator();
+            showToaster('{% trans "Error al cargar la imagen de fondo" %}', '#ef4444');
+        };
+        img.src = event.target.result;
+    };
+    
+    reader.onerror = () => {
+        hideProcessingIndicator();
+        showToaster('{% trans "Error al leer el archivo" %}', '#ef4444');
+    };
+    
+    reader.readAsDataURL(file);
+});
+
+// Manejar selección de fondos predeterminados y subidos
+backgroundGallery.addEventListener('click', (e) => {
+    const target = e.target.closest('.bg-image-preset');
+    if (!target || target === uploadBackgroundSlot) return;
+    
+    // Limpiar selección de fondos sólidos
+    document.querySelectorAll('.bg-preset').forEach(b => {
+        b.classList.remove('selected');
+        b.setAttribute('aria-pressed', 'false');
+    });
+    
+    // Remover selección anterior de fondos con imagen
+    backgroundGallery.querySelectorAll('.bg-image-preset').forEach(el => {
+        if (el !== uploadBackgroundSlot) el.classList.remove('selected');
+    });
+
+    // Seleccionar nuevo fondo
+    target.classList.add('selected');
+    
+    if (target.dataset.bgType === 'uploaded') {
+        const index = parseInt(target.dataset.bgIndex);
+        const backgroundData = uploadedBackgrounds[index];
+        selectBackgroundImage(target, backgroundData.original);
+    } else if (target.dataset.bgType === 'gradient') {
+        selectBackgroundGradient(target);
+    } else if (target.dataset.bgType === 'pattern') {
+        selectBackgroundPattern(target);
+    }
+});
+
+function selectBackgroundImage(element, imageUrl) {
+    currentBackgroundImage = imageUrl;
+    currentBackgroundType = 'image';
+    bgDrawToken++;
+    
+    // Aplicar fondo si hay resultado
+    if (lastResultImg) {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+    
+    showStatus('{% trans "Fondo de imagen aplicado" %}');
+}
+
+function selectBackgroundGradient(element) {
+    const gradientStyle = element.style.background;
+    currentBackgroundImage = gradientStyle;
+    currentBackgroundType = 'gradient';
+    bgDrawToken++;
+    
+    if (lastResultImg) {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+    
+    showStatus('{% trans "Fondo degradado aplicado" %}');
+}
+
+function selectBackgroundPattern(element) {
+    const patternStyle = element.style.background;
+    currentBackgroundImage = patternStyle;
+    currentBackgroundType = 'pattern';
+    bgDrawToken++;
+    
+    if (lastResultImg) {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+    
+    showStatus('{% trans "Fondo de patrón aplicado" %}');
+}
+
+// Controles de escala
+backgroundScaleSelect.addEventListener('change', (e) => {
+    backgroundScale = e.target.value;
+    if (lastResultImg && currentBackgroundType !== 'solid') {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+});
+
+// Controles de posición
+positionGrid.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('position-dot')) return;
+    
+    // Remover selección anterior
+    positionGrid.querySelectorAll('.position-dot').forEach(dot => {
+        dot.classList.remove('active');
+    });
+    
+    // Seleccionar nueva posición
+    e.target.classList.add('active');
+    backgroundPosition = e.target.dataset.position;
+    
+    if (lastResultImg && currentBackgroundType !== 'solid') {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+});
+
+// Control de opacidad
+backgroundOpacitySlider.addEventListener('input', (e) => {
+    backgroundOpacity = parseFloat(e.target.value);
+    opacityValue.textContent = Math.round(backgroundOpacity * 100) + '%';
+    
+    if (lastResultImg && currentBackgroundType !== 'solid') {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+});
+
+function drawResultWithBackground() {
+    if (!lastResultImg) return;
+    
+    const w = lastResultImg.width;
+    const h = lastResultImg.height;
+    canvas.width = w;
+    canvas.height = h;
+    ctx.clearRect(0, 0, w, h);
+    
+    if (currentBackgroundType === 'image' && currentBackgroundImage) {
+        // Dibujar imagen de fondo (con token para evitar race conditions)
+        const myToken = ++bgDrawToken;
+        const bgImg = new Image();
+        bgImg.onload = () => {
+            if (myToken !== bgDrawToken) return; // stale load
+            ctx.save();
+            ctx.globalAlpha = backgroundOpacity;
+
+            let drawX = 0, drawY = 0, drawW = w, drawH = h;
+
+            switch (backgroundScale) {
+                case 'cover': {
+                    const scaleX = w / bgImg.width;
+                    const scaleY = h / bgImg.height;
+                    const scale = Math.max(scaleX, scaleY);
+                    drawW = bgImg.width * scale;
+                    drawH = bgImg.height * scale;
+                } break;
+                case 'contain': {
+                    const scaleX2 = w / bgImg.width;
+                    const scaleY2 = h / bgImg.height;
+                    const scale2 = Math.min(scaleX2, scaleY2);
+                    drawW = bgImg.width * scale2;
+                    drawH = bgImg.height * scale2;
+                } break;
+                case 'fill':
+                    // Usar tamaño completo del canvas
+                    break;
+                case 'repeat': {
+                    const pattern = ctx.createPattern(bgImg, 'repeat');
+                    ctx.fillStyle = pattern;
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.restore();
+                    ctx.drawImage(lastResultImg, 0, 0);
+                    return;
+                }
+            }
+
+            // Calcular posición
+            if (backgroundScale !== 'fill') {
+                const [vAlign, hAlign] = backgroundPosition.split(' ');
+                switch (hAlign) {
+                    case 'left': drawX = 0; break;
+                    case 'right': drawX = w - drawW; break;
+                    default: drawX = (w - drawW) / 2; break;
+                }
+                switch (vAlign) {
+                    case 'top': drawY = 0; break;
+                    case 'bottom': drawY = h - drawH; break;
+                    default: drawY = (h - drawH) / 2; break;
+                }
+            }
+
+            ctx.drawImage(bgImg, drawX, drawY, drawW, drawH);
+            ctx.restore();
+            ctx.drawImage(lastResultImg, 0, 0);
+        };
+        bgImg.src = currentBackgroundImage;
+    } else if (currentBackgroundType === 'gradient' || currentBackgroundType === 'pattern') {
+        // Para gradientes y patrones, intentar renderizar el CSS inline real.
+        ctx.save();
+        ctx.globalAlpha = backgroundOpacity;
+
+        // Helper: extrae colores hex desde la cadena CSS
+        function extractHexColors(str) {
+            const re = /#([0-9a-fA-F]{3,6})/g;
+            const out = [];
+            let m;
+            while ((m = re.exec(str)) !== null) out.push('#' + m[1]);
+            return out;
+        }
+
+        if (currentBackgroundType === 'gradient' && currentBackgroundImage && currentBackgroundImage.includes('linear-gradient')) {
+            try {
+                // Extraer ángulo (en deg) y colores
+                const angleMatch = currentBackgroundImage.match(/([0-9]+)deg/);
+                const angle = angleMatch ? parseFloat(angleMatch[1]) : 180;
+                const colorStops = [];
+                // Buscar colores con porcentaje opcional
+                const stopRe = /(#(?:[0-9a-fA-F]{3,6})|rgba?\([^\)]+\))\s*([0-9]{1,3}%?)?/g;
+                let sm;
+                while ((sm = stopRe.exec(currentBackgroundImage)) !== null) {
+                    const col = sm[1];
+                    const pct = sm[2] || '';
+                    colorStops.push({ color: col, stop: pct });
+                }
+                // Fallback: if no stops found, fallback to extracting hex colors
+                if (!colorStops.length) {
+                    const hex = extractHexColors(currentBackgroundImage);
+                    if (hex.length >= 2) {
+                        colorStops.push({ color: hex[0], stop: '0%' });
+                        colorStops.push({ color: hex[1], stop: '100%' });
+                    } else if (hex.length === 1) {
+                        colorStops.push({ color: hex[0], stop: '0%' });
+                        colorStops.push({ color: hex[0], stop: '100%' });
+                    }
+                }
+
+                // Construir SVG con linearGradient
+                const id = 'g' + Date.now();
+                const stopsSvg = colorStops.map((s, i) => {
+                    const offset = s.stop && s.stop.toString().includes('%') ? s.stop : (i === 0 ? '0%' : (i === colorStops.length - 1 ? '100%' : ((i/(colorStops.length-1))*100+'%')));
+                    // Escape ampersands just in case
+                    const colorEsc = s.color.replace(/"/g, '');
+                    return `<stop offset="${offset}" stop-color="${colorEsc}" />`;
+                }).join('');
+
+                // gradient direction via rotate transform
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">` +
+                            `<defs><linearGradient id="${id}" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(${angle})">${stopsSvg}</linearGradient></defs>` +
+                            `<rect width="100%" height="100%" fill="url(#${id})" /></svg>`;
+                const svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+                const gimg = new Image();
+                gimg.onload = () => {
+                    ctx.drawImage(gimg, 0, 0, w, h);
+                    ctx.restore();
+                    ctx.drawImage(lastResultImg, 0, 0);
+                };
+                gimg.onerror = () => {
+                    // Fallback simple
+                    ctx.fillStyle = colorStops.length ? colorStops[0].color : '#f8fafc';
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.restore();
+                    ctx.drawImage(lastResultImg, 0, 0);
+                };
+                gimg.src = svgUrl;
+                return; // async draw will happen in onload
+            } catch (err) {
+                console.error('Gradient render error', err);
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(0, 0, w, h);
+            }
+        } else if (currentBackgroundType === 'pattern' && currentBackgroundImage) {
+            // Manejo básico de patrones conocidos: stripes o dots
+            if (currentBackgroundImage.includes('repeating-linear-gradient')) {
+                // Extraer dos colores si es posible
+                const hex = extractHexColors(currentBackgroundImage);
+                const c1 = hex[0] || '#f8f9fa';
+                const c2 = hex[1] || '#e9ecef';
+                // Dibujar patrón de rayas diagonales
+                const tile = document.createElement('canvas');
+                tile.width = 40; tile.height = 40;
+                const tctx = tile.getContext('2d');
+                tctx.fillStyle = c1; tctx.fillRect(0,0,40,40);
+                tctx.fillStyle = c2; tctx.fillRect(0,0,40,20);
+                const pattern = ctx.createPattern(tile, 'repeat');
+                ctx.fillStyle = pattern;
+                ctx.fillRect(0, 0, w, h);
+            } else if (currentBackgroundImage.includes('radial-gradient') || currentBackgroundImage.includes('radial')) {
+                // Dibujar patrón de puntos simple
+                ctx.fillStyle = '#f8f9fa';
+                ctx.fillRect(0,0,w,h);
+                ctx.fillStyle = '#e9ecef';
+                const spacing = 20;
+                for (let y=spacing/2;y<h;y+=spacing) for (let x=spacing/2;x<w;x+=spacing) ctx.beginPath(), ctx.arc(x,y,2,0,Math.PI*2), ctx.fill();
+            } else {
+                // Fallback sólido
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(0,0,w,h);
+            }
+            ctx.restore();
+            ctx.drawImage(lastResultImg, 0, 0);
+            return;
+        }
+
+        // Si llegamos aquí (no async svg), dibujar fallback y la imagen
+        ctx.fillStyle = currentBgColor !== 'transparent' ? currentBgColor : '#f8fafc';
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+        ctx.drawImage(lastResultImg, 0, 0);
+    } else {
+        // Fondo sólido tradicional
+        if (currentBgColor !== "transparent") {
+            ctx.fillStyle = currentBgColor;
+            ctx.fillRect(0, 0, w, h);
+        }
+        ctx.drawImage(lastResultImg, 0, 0);
+    }
+}
+
+// Modificar la función drawResultOnCanvas existente para usar backgrounds
+const originalDrawResultOnCanvas = window.drawResultOnCanvas;
+window.drawResultOnCanvas = function(dataURL) {
+    const img = new Image();
+    img.onload = () => {
+        lastResultImg = img;
+        const w = img.width, h = img.height;
+        canvas.width = w;
+        canvas.height = h;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Usar nuevo sistema de fondos si está activo
+        if (currentBackgroundType !== 'solid') {
+            drawResultWithBackground();
+        } else {
+            // Usar fondo sólido tradicional
+            if (currentBgColor !== "transparent") {
+                ctx.fillStyle = currentBgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            ctx.drawImage(img, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+        }
+    };
+    img.src = dataURL;
+};
+
+// === FIN DE FUNCIONALIDAD DE FONDOS CON IMAGEN ===
 </script>
 {% endblock %}
