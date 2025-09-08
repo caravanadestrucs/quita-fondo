@@ -613,6 +613,15 @@
                                 <div class="bg-image-preset" data-bg-type="gradient" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);" title="{% trans 'Gradiente verde-rosa suave' %}"></div>
                                 <div class="bg-image-preset" data-bg-type="pattern" style="background: repeating-linear-gradient(45deg, #f8f9fa 0px, #f8f9fa 10px, #e9ecef 10px, #e9ecef 20px);" title="{% trans 'Patrón de rayas' %}"></div>
                                 <div class="bg-image-preset" data-bg-type="pattern" style="background: radial-gradient(circle at 25% 25%, #f8f9fa 2px, transparent 2px), radial-gradient(circle at 75% 75%, #e9ecef 2px, transparent 2px); background-size: 20px 20px;" title="{% trans 'Patrón de puntos' %}"></div>
+
+                                <!-- Presets de imagen precargadas -->
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo1.jpg" style="background-image: url('/static/images/fondo1.jpg'); background-size: cover;" title="Detalles artísticos"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo2.jpg" style="background-image: url('/static/images/fondo2.jpg'); background-size: cover;" title="Detalles artísticos 1"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo3.jpg" style="background-image: url('/static/images/fondo3.jpg'); background-size: cover;" title="Detalles artísticos 2"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo4.jpg" style="background-image: url('/static/images/fondo4.jpg'); background-size: cover;" title="Detalles artísticos 3"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo5.jpg" style="background-image: url('/static/images/fondo5.jpg'); background-size: cover;" title="Detalles artísticos 4"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo6.jpg" style="background-image: url('/static/images/fondo6.jpg'); background-size: cover;" title="Detalles artísticos 5"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo7.jpg" style="background-image: url('/static/images/fondo7.jpg'); background-size: cover;" title="Detalles artísticos 6"></div>
                             </div>
                             
                             <div class="background-controls">
@@ -1272,6 +1281,8 @@ function processImage(file, maskData) {
         } else {
             lastResultDataUrl = data.image_data;
             drawResultOnCanvas(data.image_data);
+            // Actualizar enlace a Canva con la imagen procesada
+            if (typeof updateCanvaLink === 'function') updateCanvaLink();
             downloadBtn.disabled = false;
             
             const timeText = processingTime > 1000 ? 
@@ -1499,6 +1510,17 @@ backgroundGallery.addEventListener('click', (e) => {
         const index = parseInt(target.dataset.bgIndex);
         const backgroundData = uploadedBackgrounds[index];
         selectBackgroundImage(target, backgroundData.original);
+    } else if (target.dataset.bgType === 'image') {
+        // Imagen precargada: preferir data-bg-src si está disponible
+        let src = target.dataset.bgSrc;
+        if (!src) {
+            // intentar extraer de computedStyle background-image
+            const cs = window.getComputedStyle(target);
+            const bg = cs.backgroundImage || cs.background || '';
+            const m = bg.match(/url\((?:"|')?(.*?)(?:"|')?\)/);
+            if (m) src = m[1];
+        }
+        if (src) selectBackgroundImage(target, src);
     } else if (target.dataset.bgType === 'gradient') {
         selectBackgroundGradient(target);
     } else if (target.dataset.bgType === 'pattern') {
@@ -1796,6 +1818,74 @@ window.drawResultOnCanvas = function(dataURL) {
     };
     img.src = dataURL;
 };
+
+// Actualizar enlace de Canva para enviar la imagen procesada (si está disponible)
+function updateCanvaLink() {
+    const a = document.getElementById('canvaEditLink');
+    if (!a) return;
+    const defaultHref = a.getAttribute('data-default-href') || a.href;
+    if (lastResultDataUrl) {
+        try {
+            // Construir URL de Canva con image-url param; encodeURIComponent puede ser grande para data URLs but works for modern browsers
+            const url = new URL(defaultHref);
+            // Set or replace image-url parameter
+            url.searchParams.set('image-url', lastResultDataUrl);
+            a.href = url.toString();
+        } catch (err) {
+            // Fallback: append as param
+            a.href = defaultHref.split('?')[0] + '?image-url=' + encodeURIComponent(lastResultDataUrl);
+        }
+    } else {
+        a.href = defaultHref;
+    }
+}
+
+// Llamar al actualizar el link cuando el documento cargue y después de dibujar resultado
+document.addEventListener('DOMContentLoaded', () => updateCanvaLink());
+
+// Interceptar click en el enlace de Canva para subir la imagen procesada al servidor
+document.addEventListener('click', (ev) => {
+    const target = ev.target.closest && ev.target.closest('#canvaEditLink');
+    if (!target) return;
+    // Si no hay imagen procesada, permitir el comportamiento por defecto
+    if (!lastResultDataUrl) return;
+
+    ev.preventDefault();
+    const a = target;
+    // Mostrar indicador de procesamiento ligero
+    showProcessingIndicator('{% trans "Preparando imagen para editar en Canva..." %}');
+
+    // Subir la imagen al endpoint que guarda en MEDIA y devuelve URL pública
+    fetch('/api/upload-image/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ image_data: lastResultDataUrl }).toString()
+    }).then(r => r.json())
+    .then(json => {
+        hideProcessingIndicator();
+        if (json && json.success && json.url) {
+            // Construir URL de Canva reemplazando image-url por la nueva URL pública
+            try {
+                const url = new URL(a.getAttribute('data-default-href') || a.href);
+                url.searchParams.set('image-url', json.url);
+                window.open(url.toString(), '_blank', 'noopener');
+            } catch (err) {
+                // Fallback
+                const base = (a.getAttribute('data-default-href') || a.href).split('?')[0];
+                window.open(base + '?image-url=' + encodeURIComponent(json.url), '_blank', 'noopener');
+            }
+        } else {
+            showToaster('{% trans "No se pudo subir la imagen. Intenta descargarla y subirla manualmente a Canva." %}', '#ef4444');
+        }
+    }).catch(err => {
+        hideProcessingIndicator();
+        console.error('Upload error', err);
+        showToaster('{% trans "Error al subir la imagen a servidor." %}', '#ef4444');
+    });
+});
 
 // === FIN DE FUNCIONALIDAD DE FONDOS CON IMAGEN ===
 </script>
