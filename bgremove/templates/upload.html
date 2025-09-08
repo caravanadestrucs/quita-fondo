@@ -1350,30 +1350,141 @@ downloadBtn.addEventListener('click', () => {
     exportCanvas.height = h;
     const exportCtx = exportCanvas.getContext('2d');
     exportCtx.clearRect(0, 0, w, h);
-    if (currentBgColor !== "transparent") {
-        exportCtx.fillStyle = currentBgColor;
-        exportCtx.fillRect(0, 0, w, h);
-    }
-    exportCtx.drawImage(lastResultImg, 0, 0, w, h);
 
-    if (format === 'png') {
-        exportCanvas.toBlob(function(blob) {
+    // Helper para emitir el archivo final
+    function emitExport() {
+        if (format === 'png') {
+            exportCanvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                downloadBlob(url, `imagen-procesada-${scale}x.png`);
+            }, 'image/png');
+        } else if (format === 'webp') {
+            exportCanvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                downloadBlob(url, `imagen-procesada-${scale}x.webp`);
+            }, 'image/webp');
+        } else if (format === 'svg') {
+            const dataURL = exportCanvas.toDataURL('image/png');
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">` +
+                        `<image href="${dataURL}" width="${w}" height="${h}"/></svg>`;
+            const blob = new Blob([svg], {type: 'image/svg+xml'});
             const url = URL.createObjectURL(blob);
-            downloadBlob(url, `imagen-procesada-${scale}x.png`);
-        }, 'image/png');
-    } else if (format === 'webp') {
-        exportCanvas.toBlob(function(blob) {
-            const url = URL.createObjectURL(blob);
-            downloadBlob(url, `imagen-procesada-${scale}x.webp`);
-        }, 'image/webp');
-    } else if (format === 'svg') {
-        const dataURL = exportCanvas.toDataURL('image/png');
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-            <image href="${dataURL}" width="${w}" height="${h}"/>
-        </svg>`;
-        const blob = new Blob([svg], {type: 'image/svg+xml'});
-        const url = URL.createObjectURL(blob);
-        downloadBlob(url, `imagen-procesada-${scale}x.svg`);
+            downloadBlob(url, `imagen-procesada-${scale}x.svg`);
+        }
+    }
+
+    // Dibujar fondo según tipo seleccionado
+    if (currentBackgroundType === 'solid') {
+        if (currentBgColor !== "transparent") {
+            exportCtx.fillStyle = currentBgColor;
+            exportCtx.fillRect(0, 0, w, h);
+        }
+        exportCtx.drawImage(lastResultImg, 0, 0, w, h);
+        emitExport();
+    } else if (currentBackgroundType === 'image' && currentBackgroundImage) {
+        const bgImg = new Image();
+        bgImg.crossOrigin = 'anonymous';
+        bgImg.onload = () => {
+            exportCtx.save();
+            exportCtx.globalAlpha = backgroundOpacity || 1;
+
+            let drawX = 0, drawY = 0, drawW = w, drawH = h;
+            switch (backgroundScale) {
+                case 'cover': {
+                    const scaleX = w / bgImg.width;
+                    const scaleY = h / bgImg.height;
+                    const scale = Math.max(scaleX, scaleY);
+                    drawW = bgImg.width * scale; drawH = bgImg.height * scale;
+                } break;
+                case 'contain': {
+                    const scaleX2 = w / bgImg.width; const scaleY2 = h / bgImg.height;
+                    const scale2 = Math.min(scaleX2, scaleY2);
+                    drawW = bgImg.width * scale2; drawH = bgImg.height * scale2;
+                } break;
+                case 'fill': break;
+                case 'repeat': {
+                    const pattern = exportCtx.createPattern(bgImg, 'repeat');
+                    exportCtx.fillStyle = pattern;
+                    exportCtx.fillRect(0, 0, w, h);
+                    exportCtx.restore();
+                    exportCtx.drawImage(lastResultImg, 0, 0, w, h);
+                    emitExport();
+                    return;
+                }
+            }
+
+            if (backgroundScale !== 'fill') {
+                const [vAlign, hAlign] = (backgroundPosition || 'center center').split(' ');
+                switch (hAlign) { case 'left': drawX = 0; break; case 'right': drawX = w - drawW; break; default: drawX = (w - drawW)/2; }
+                switch (vAlign) { case 'top': drawY = 0; break; case 'bottom': drawY = h - drawH; break; default: drawY = (h - drawH)/2; }
+            }
+
+            exportCtx.drawImage(bgImg, drawX, drawY, drawW, drawH);
+            exportCtx.restore();
+            exportCtx.drawImage(lastResultImg, 0, 0, w, h);
+            emitExport();
+        };
+        bgImg.onerror = () => {
+            // Fallback: draw transparent background and the image
+            exportCtx.fillStyle = '#f8fafc'; exportCtx.fillRect(0,0,w,h);
+            exportCtx.drawImage(lastResultImg, 0, 0, w, h);
+            emitExport();
+        };
+        bgImg.src = currentBackgroundImage;
+    } else if ((currentBackgroundType === 'gradient' || currentBackgroundType === 'pattern') && currentBackgroundImage) {
+        // Use same strategy as preview: gradients via SVG, patterns via canvas tiles
+        if (currentBackgroundType === 'gradient' && currentBackgroundImage.includes('linear-gradient')) {
+            try {
+                // build SVG like in preview
+                const angleMatch = currentBackgroundImage.match(/([0-9]+)deg/);
+                const angle = angleMatch ? parseFloat(angleMatch[1]) : 180;
+                const colorStops = [];
+                const stopRe = /(#(?:[0-9a-fA-F]{3,6})|rgba?\([^\)]+\))\s*([0-9]{1,3}%?)?/g;
+                let sm;
+                while ((sm = stopRe.exec(currentBackgroundImage)) !== null) {
+                    const col = sm[1]; const pct = sm[2] || '';
+                    colorStops.push({ color: col, stop: pct });
+                }
+                if (!colorStops.length) {
+                    const re = /#([0-9a-fA-F]{3,6})/g; let out=[]; let m;
+                    while ((m = re.exec(currentBackgroundImage)) !== null) out.push('#'+m[1]);
+                    if (out.length>=2) { colorStops.push({color:out[0],stop:'0%'}); colorStops.push({color:out[1],stop:'100%'}); }
+                    else if (out.length===1) { colorStops.push({color:out[0],stop:'0%'}); colorStops.push({color:out[0],stop:'100%'}); }
+                }
+
+                const id = 'exp' + Date.now();
+                const stopsSvg = colorStops.map((s,i)=>{ const offset = s.stop && s.stop.toString().includes('%')?s.stop:(i===0?'0%':(i===colorStops.length-1?'100%':((i/(colorStops.length-1))*100+'%'))); const colorEsc = s.color.replace(/"/g,''); return `<stop offset="${offset}" stop-color="${colorEsc}" />`; }).join('');
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">`+
+                            `<defs><linearGradient id="${id}" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(${angle})">${stopsSvg}</linearGradient></defs>`+
+                            `<rect width="100%" height="100%" fill="url(#${id})" /></svg>`;
+                const svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+                const gimg = new Image();
+                gimg.onload = () => { exportCtx.drawImage(gimg,0,0,w,h); exportCtx.drawImage(lastResultImg,0,0,w,h); emitExport(); };
+                gimg.onerror = () => { exportCtx.fillStyle = colorStops.length?colorStops[0].color:'#f8fafc'; exportCtx.fillRect(0,0,w,h); exportCtx.drawImage(lastResultImg,0,0,w,h); emitExport(); };
+                gimg.src = svgUrl;
+            } catch (err) { console.error('Export gradient error',err); exportCtx.fillStyle='#f8fafc'; exportCtx.fillRect(0,0,w,h); exportCtx.drawImage(lastResultImg,0,0,w,h); emitExport(); }
+        } else {
+            // pattern fallback: draw simple tile
+            try {
+                if (currentBackgroundImage.includes('repeating-linear-gradient')) {
+                    const re = /#([0-9a-fA-F]{3,6})/g; let out=[]; let m;
+                    while ((m = re.exec(currentBackgroundImage)) !== null) out.push('#'+m[1]);
+                    const c1 = out[0]||'#f8f9fa'; const c2 = out[1]||'#e9ecef';
+                    const tile = document.createElement('canvas'); tile.width=40; tile.height=40; const tctx = tile.getContext('2d');
+                    tctx.fillStyle=c1; tctx.fillRect(0,0,40,40); tctx.fillStyle=c2; tctx.fillRect(0,0,40,20);
+                    const pattern = exportCtx.createPattern(tile,'repeat'); exportCtx.fillStyle = pattern; exportCtx.fillRect(0,0,w,h);
+                } else {
+                    exportCtx.fillStyle = '#f8fafc'; exportCtx.fillRect(0,0,w,h);
+                }
+            } catch(e){ exportCtx.fillStyle='#f8fafc'; exportCtx.fillRect(0,0,w,h); }
+            exportCtx.drawImage(lastResultImg,0,0,w,h); emitExport();
+        }
+    } else {
+        // Fallback genérico
+        exportCtx.fillStyle = currentBgColor !== 'transparent' ? currentBgColor : '#f8fafc';
+        exportCtx.fillRect(0,0,w,h);
+        exportCtx.drawImage(lastResultImg,0,0,w,h);
+        emitExport();
     }
 });
 
