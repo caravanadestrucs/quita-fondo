@@ -68,8 +68,9 @@
     }
     .canvas-wrap {
         position: relative;
-        width: 480px;
-        height: 480px;
+        width: 100%;
+        max-width: 480px;
+        aspect-ratio: 1 / 1;
         margin: 0 auto;
         background: #eef2ff;
         border-radius: 14px;
@@ -194,18 +195,129 @@
     .btn, .btn-secondary, .btn-success {
         border-radius: 8px;
         font-size: 16px;
-        padding: 8px 18px;
+        padding: 12px 20px; /* Aumentado para mejor touch */
         font-weight: 600;
         border: none;
         cursor: pointer;
         margin-right: 8px;
-        transition: background 0.2s;
+        margin-bottom: 8px; /* Para mobile stacking */
+        transition: background 0.2s, transform 0.1s;
+        min-height: 44px; /* iOS touch target minimum */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
     }
     .btn-secondary { background: #e5e7eb; color: #222; }
     .btn-success { background: #22c55e; color: #fff; }
-    .btn-secondary:hover { background: #d1d5db; }
-    .btn-success:hover { background: #16a34a; }
-    .btn:disabled { background: #f3f4f6; color: #aaa; cursor: not-allowed; }
+    .btn-secondary:hover { background: #d1d5db; transform: translateY(-1px); }
+    .btn-success:hover { background: #16a34a; transform: translateY(-1px); }
+    .btn:disabled { background: #f3f4f6; color: #aaa; cursor: not-allowed; transform: none; }
+    .btn:active { transform: translateY(0); }
+    
+    /* Mejoras touch-friendly */
+    .swatch {
+        width: 44px; /* Aumentado de 36px */
+        height: 44px;
+        border-radius: 50%;
+        border: 2px solid #2563eb;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #fff;
+        margin-right: 10px;
+        margin-bottom: 8px;
+        box-shadow: 0 2px 8px #2563eb22;
+        transition: border 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+    .swatch:hover, .swatch:focus { transform: scale(1.05); }
+    .swatch:active { transform: scale(0.95); }
+    
+    .bg-preset {
+        width: 36px; /* Aumentado de 28px */
+        height: 36px;
+        border: 2px solid #ccc;
+        border-radius: 50%;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        outline: none;
+        box-shadow: 0 2px 8px #2563eb11;
+        transition: border 0.2s, transform 0.1s;
+    }
+    .bg-preset:hover, .bg-preset:focus { transform: scale(1.1); }
+    .bg-preset:active { transform: scale(0.9); }
+    
+    /* Indicadores visuales mejorados */
+    .processing-indicator {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(37, 99, 235, 0.9);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        backdrop-filter: blur(8px);
+        z-index: 1000;
+        display: none;
+    }
+    
+    .loading-spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ffffff40;
+        border-top: 2px solid #ffffff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Tooltips mejorados */
+    .tooltip {
+        position: relative;
+        display: inline-block;
+    }
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 14px;
+        position: absolute;
+        z-index: 1000;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+    
+    /* Error states */
+    .error-state {
+        border: 2px solid #ef4444 !important;
+        background-color: #fef2f2 !important;
+    }
+    .success-state {
+        border: 2px solid #22c55e !important;
+        background-color: #f0fdf4 !important;
+    }
     #toaster {
         position:fixed;
         bottom:32px;
@@ -254,10 +366,103 @@
     }
     /* Responsive for mobile */
     @media (max-width: 600px) {
-        .canvas-wrap { width: 98vw; height: 60vw; min-height: 220px; }
+    .canvas-wrap { width: 98vw; aspect-ratio: auto; min-height: 220px; }
         canvas { border-radius: 8px; }
         .card { padding: 8px 2vw; }
         .download-row { flex-direction: column; gap: 8px; }
+    }
+    
+    /* Estilos para fondos con imagen */
+    .background-image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 8px;
+        margin-top: 12px;
+    }
+    
+    .bg-image-preset {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: border-color 0.2s, transform 0.1s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .bg-image-preset:hover {
+        transform: scale(1.05);
+    }
+    
+    .bg-image-preset.selected {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px #2563eb33;
+    }
+    
+    .bg-image-preset.upload-slot {
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: #64748b;
+        border: 2px dashed #cbd5e1;
+    }
+    
+    .bg-image-preset.upload-slot:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+    }
+    
+    .background-controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .bg-scale-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .bg-position-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .position-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 20px);
+        grid-template-rows: repeat(3, 20px);
+        gap: 2px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        padding: 4px;
+    }
+    
+    .position-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 2px;
+        background: #e5e7eb;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .position-dot:hover {
+        background: #cbd5e1;
+    }
+    
+    .position-dot.active {
+        background: #2563eb;
     }
 </style>
 {% endblock %}
@@ -267,25 +472,27 @@
     <br>
     <br>
 </div>
+<main id="main" role="main" aria-labelledby="pageTitle">
 <div class="card" >
-    <h1>{% trans "Quita el fondo de tu imagen" %}</h1>
+    <h1 id="pageTitle">{% trans "Quita el fondo de tu imagen" %}</h1>
     <form id="form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="responsive-grid">
             <div>
                 <div class="upload-btn" id="uploadBtnWrap">
-                    <input id="image" type="file" name="image" accept="image/*">
-                    <label for="image" id="uploadLabel">{% trans "Subir imagen" %} <span id="fileName"></span></label>
+                    <input id="image" type="file" name="image" accept="image/*" aria-label="{% trans "Seleccionar imagen" %}">
+                    <label for="image" id="uploadLabel" role="button" aria-controls="canvas" aria-describedby="uploadHelp">{% trans "Subir imagen" %} <span id="fileName"></span></label>
+                    <div id="uploadHelp" class="visually-hidden">{% trans "Puedes arrastrar una imagen aquí, pegar desde el portapapeles o usar el botón para seleccionar un archivo." %}</div>
                 </div>
-                <div class="canvas-wrap" style="position:relative; width:480px; height:480px; margin:0 auto;">
-                    <canvas id="canvas" width="480" height="480" style="width:100%; height:100%;"></canvas>
+                <div class="canvas-wrap" style="position:relative; margin:0 auto;">
+                    <canvas id="canvas" width="480" height="480" style="width:100%; height:100%;" aria-label="Lienzo de edición" role="img"></canvas>
                     <div id="transitionCurtain" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#2563eb;opacity:0;pointer-events:none;z-index:2;transition:transform 0.7s cubic-bezier(.77,0,.18,1), opacity 0.3s; transform:translateX(-100%);">
                         <div id="progressBar">
                             <div id="progressFill"></div>
                         </div>
                     </div>
                 </div>
-                <div class="legend">
+                <div class="legend" id="legend">
                     <strong>{% trans "Pincel verde" %}</strong> = {% trans "conservar" %}, <strong>{% trans "pincel rojo" %}</strong> = {% trans "quitar fondo" %}.<br>
                     {% trans "Si no te gusta el resultado automático, usa los pinceles y haz clic en" %} <b>{% trans "Procesar" %}</b>.
                 </div>
@@ -293,16 +500,16 @@
             <div>
                 <div class="download-row" style="flex-direction:column;align-items:flex-start;gap:0;">
                     <div class="download-combo" style="display:flex;flex-direction:row;align-items:center;width:100%;">
-                        <button type="button" id="downloadBtn" disabled title="{% trans 'Descargar imagen' %}" style="border-radius:10px;flex:1 1 auto;min-width:160px;max-width:240px;font-size:18px;padding:12px 18px;display:flex;align-items:center;justify-content:center;gap:12px;">
+                        <button type="button" id="downloadBtn" disabled title="{% trans 'Descargar imagen' %}" style="border-radius:10px;flex:1 1 auto;min-width:160px;max-width:240px;font-size:18px;padding:12px 18px;display:flex;align-items:center;justify-content:center;gap:12px;" aria-label="{% trans 'Descargar imagen procesada' %}">
                             <span style="font-size:22px;">&#128190;</span>
                             <span>{% trans "Descargar" %}</span>
                         </button>
-                        <select id="formatSelect" title="{% trans 'Formato de descarga' %}" style="margin-left:-1px;border-radius:0;min-width:80px;font-size:16px;">
+                        <select id="formatSelect" title="{% trans 'Formato de descarga' %}" style="margin-left:-1px;border-radius:0;min-width:80px;font-size:16px;" aria-label="{% trans 'Formato de descarga' %}">
                             <option value="png">PNG</option>
                             <option value="webp">WebP</option>
                             <option value="svg">SVG</option>
                         </select>
-                        <select id="resolutionSelect" title="{% trans 'Resolución' %}" style="margin-left:-1px;border-radius:0 10px 10px 0;min-width:80px;font-size:16px;">
+                        <select id="resolutionSelect" title="{% trans 'Resolución' %}" style="margin-left:-1px;border-radius:0 10px 10px 0;min-width:80px;font-size:16px;" aria-label="{% trans 'Resolución de descarga' %}">
                             <option value="1">1x</option>
                             <option value="2">2x</option>
                             <option value="4">4x</option>
@@ -312,29 +519,147 @@
                 </div>
                 <div class="field">
                     <label>{% trans "Herramientas" %}</label>
-                    <div class="toolbar">
-                        <div class="swatch selected" data-color="keep" title="{% trans 'Conservar' %}">&#x2714;</div>
-                        <div class="swatch" data-color="remove" title="{% trans 'Quitar fondo' %}">&#x2716;</div>
-                        <label style="margin-left:10px;">{% trans "Grosor" %}
-                            <input id="size" type="range" min="5" max="80" value="24">
+                    <div class="toolbar" role="toolbar" aria-label="Herramientas de máscara">
+                        <div class="swatch selected" data-color="keep" title="{% trans 'Conservar' %}" role="button" tabindex="0" aria-pressed="true">&#x2714;</div>
+                        <div class="swatch" data-color="remove" title="{% trans 'Quitar fondo' %}" role="button" tabindex="0" aria-pressed="false">&#x2716;</div>
+                        <label style="margin-left:10px;">{% trans "Grosor" %} <span id="sizeValue">24</span>px
+                            <input id="size" type="range" min="5" max="80" value="24" aria-label="{% trans 'Grosor del pincel' %}">
                         </label>
-                        <button type="button" id="clear" class="btn btn-secondary btn-sm" title="{% trans 'Limpiar máscara' %}">&#128465; {% trans "Limpiar" %}</button>
-                        <button type="button" id="processBtn" class="btn btn-success btn-sm" title="{% trans 'Procesar imagen' %}">&#9881; {% trans "Procesar" %}</button>
-                        <button type="button" id="undoBtn" class="btn btn-secondary btn-sm" title="{% trans 'Deshacer último trazo' %}">&#8630; {% trans "Deshacer" %}</button>
+                        <button type="button" id="clear" class="btn btn-secondary btn-sm" title="{% trans 'Limpiar máscara' %}" aria-label="{% trans 'Limpiar máscara' %}">&#128465; {% trans "Limpiar" %}</button>
+                        <button type="button" id="processBtn" class="btn btn-success btn-sm" title="{% trans 'Procesar imagen' %}" aria-label="{% trans 'Procesar imagen' %}">&#9881; {% trans "Procesar" %}</button>
+                        <button type="button" id="undoBtn" class="btn btn-secondary btn-sm" title="{% trans 'Deshacer último trazo' %}" aria-label="{% trans 'Deshacer último trazo' %}">&#8630; {% trans "Deshacer" %}</button>
                     </div>
                 </div>
+                
+                <!-- Controles avanzados -->
                 <div class="field">
-                    <label style="margin-left:10px;">{% trans "Fondo" %}
-                        <span id="presetColors">
-                            <button type="button" class="bg-preset" data-color="transparent" style="background: repeating-linear-gradient(45deg,#ccc 0 8px,#fff 8px 16px);" title="{% trans 'Sin fondo' %}">✕</button>
-                            <button type="button" class="bg-preset" data-color="#ffffff" style="background:#fff;" title="{% trans 'Blanco' %}"></button>
-                            <button type="button" class="bg-preset" data-color="#000000" style="background:#000;" title="{% trans 'Negro' %}"></button>
-                            <button type="button" class="bg-preset" data-color="#2563eb" style="background:#2563eb;" title="{% trans 'Azul' %}"></button>
-                            <button type="button" class="bg-preset" data-color="#22c55e" style="background:#22c55e;" title="{% trans 'Verde' %}"></button>
-                            <button type="button" class="bg-preset" data-color="#ef4444" style="background:#ef4444;" title="{% trans 'Rojo' %}"></button>
-                        </span>
-                        <input type="color" id="bgColor" value="#ffffff" style="width:32px; height:32px; border:none; vertical-align:middle;" title="{% trans 'Color personalizado' %}">
-                    </label>
+                    <details>
+                        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 12px;">{% trans "Configuración avanzada" %}</summary>
+                        <div class="advanced-controls" style="padding: 16px; background: #f8fafc; border-radius: 8px; margin-top: 8px;">
+                            <div class="row" style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+                                <label style="flex: 1; min-width: 120px;">
+                                    {% trans "Modelo IA" %}
+                                    <select id="aiModel" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <option value="u2netp">CroPix Lite ({% trans "Rápido" %})</option>
+                                        <option value="u2net">CroPix Full ({% trans "Preciso" %})</option>
+                                        <option value="silueta">{% trans "Silueta" %} ({% trans "Simple" %})</option>
+                                    </select>
+                                </label>
+                                <label style="flex: 1; min-width: 120px;">
+                                    {% trans "Calidad" %}
+                                    <select id="quality" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #d1d5db;">
+                                        <option value="fast">{% trans "Rápida" %}</option>
+                                        <option value="balanced" selected>{% trans "Equilibrada" %}</option>
+                                        <option value="high">{% trans "Alta" %}</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="row" style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-top: 12px;">
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="smoothEdges" checked>
+                                    {% trans "Suavizar bordes" %}
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="featherEdges">
+                                    {% trans "Difuminar bordes" %}
+                                </label>
+                                <label style="flex: 1; min-width: 120px;">
+                                    {% trans "Radio bordes" %}
+                                    <input type="range" id="edgeRadius" min="1" max="15" value="5" style="width: 100%;">
+                                    <span id="edgeRadiusValue">5</span>px
+                                </label>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+                <!-- Controles avanzados -->
+                <div class="field">
+                    <details>
+                        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 12px;">{% trans "Fondos Sólidos" %}</summary>
+                        <div class="advanced-controls" style="padding: 16px; background: #f8fafc; border-radius: 8px; margin-top: 8px;">
+                            <div class="row" style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+                            </div>
+                            <div class="row" style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-top: 12px;">
+                                <label style="margin-left:10px;">{% trans "Fondo" %}
+                                <span id="presetColors">
+                                    <button type="button" class="bg-preset" data-color="transparent" style="background: repeating-linear-gradient(45deg,#ccc 0 8px,#fff 8px 16px);" title="{% trans 'Sin fondo' %}" role="button" tabindex="0" aria-pressed="false">✕</button>
+                                    <button type="button" class="bg-preset" data-color="#ffffff" style="background:#fff;" title="{% trans 'Blanco' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                                    <button type="button" class="bg-preset" data-color="#000000" style="background:#000;" title="{% trans 'Negro' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                                    <button type="button" class="bg-preset" data-color="#2563eb" style="background:#2563eb;" title="{% trans 'Azul' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                                    <button type="button" class="bg-preset" data-color="#22c55e" style="background:#22c55e;" title="{% trans 'Verde' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                                    <button type="button" class="bg-preset" data-color="#ef4444" style="background:#ef4444;" title="{% trans 'Rojo' %}" role="button" tabindex="0" aria-pressed="false"></button>
+                                </span>
+                                <input type="color" id="bgColor" value="#ffffff" style="width:32px; height:32px; border:none; vertical-align:middle;" title="{% trans 'Color personalizado' %}">
+                            </label>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+                
+                <!-- Fondos con Imagen -->
+                <div class="field">
+                    <details>
+                        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 12px;">{% trans "Fondos con Imagen" %}</summary>
+                        <div class="advanced-controls" style="padding: 16px; background: #f8fafc; border-radius: 8px; margin-top: 8px;">
+                            <div class="background-image-gallery" id="backgroundGallery">
+                                <!-- Slot para subir nueva imagen -->
+                                <div class="bg-image-preset upload-slot" id="uploadBackgroundSlot" title="{% trans 'Subir imagen de fondo' %}">
+                                    &#43;
+                                </div>
+                                <!-- Presets predeterminados -->
+                                <div class="bg-image-preset" data-bg-type="gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="{% trans 'Gradiente azul-púrpura' %}"></div>
+                                <div class="bg-image-preset" data-bg-type="gradient" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" title="{% trans 'Gradiente rosa-rojo' %}"></div>
+                                <div class="bg-image-preset" data-bg-type="gradient" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);" title="{% trans 'Gradiente azul-cian' %}"></div>
+                                <div class="bg-image-preset" data-bg-type="gradient" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);" title="{% trans 'Gradiente verde-rosa suave' %}"></div>
+                                <div class="bg-image-preset" data-bg-type="pattern" style="background: repeating-linear-gradient(45deg, #f8f9fa 0px, #f8f9fa 10px, #e9ecef 10px, #e9ecef 20px);" title="{% trans 'Patrón de rayas' %}"></div>
+                                <div class="bg-image-preset" data-bg-type="pattern" style="background: radial-gradient(circle at 25% 25%, #f8f9fa 2px, transparent 2px), radial-gradient(circle at 75% 75%, #e9ecef 2px, transparent 2px); background-size: 20px 20px;" title="{% trans 'Patrón de puntos' %}"></div>
+
+                                <!-- Presets de imagen precargadas -->
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo1.jpg" style="background-image: url('/static/images/fondo1.jpg'); background-size: cover;" title="Detalles artísticos"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo2.jpg" style="background-image: url('/static/images/fondo2.jpg'); background-size: cover;" title="Detalles artísticos 1"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo3.jpg" style="background-image: url('/static/images/fondo3.jpg'); background-size: cover;" title="Detalles artísticos 2"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo4.jpg" style="background-image: url('/static/images/fondo4.jpg'); background-size: cover;" title="Detalles artísticos 3"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo5.jpg" style="background-image: url('/static/images/fondo5.jpg'); background-size: cover;" title="Detalles artísticos 4"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo6.jpg" style="background-image: url('/static/images/fondo6.jpg'); background-size: cover;" title="Detalles artísticos 5"></div>
+                                <div class="bg-image-preset" data-bg-type="image" data-bg-src="/static/images/fondo7.jpg" style="background-image: url('/static/images/fondo7.jpg'); background-size: cover;" title="Detalles artísticos 6"></div>
+                            </div>
+                            
+                            <div class="background-controls">
+                                <div class="bg-scale-control">
+                                    <label style="font-size: 14px;">{% trans "Escala" %}:</label>
+                                    <select id="backgroundScale" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #d1d5db;">
+                                        <option value="cover">{% trans "Cubrir" %}</option>
+                                        <option value="contain">{% trans "Contener" %}</option>
+                                        <option value="fill">{% trans "Rellenar" %}</option>
+                                        <option value="repeat">{% trans "Repetir" %}</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="bg-position-control">
+                                    <label style="font-size: 14px;">{% trans "Posición" %}:</label>
+                                    <div class="position-grid" id="positionGrid">
+                                        <div class="position-dot" data-position="top left"></div>
+                                        <div class="position-dot" data-position="top center"></div>
+                                        <div class="position-dot" data-position="top right"></div>
+                                        <div class="position-dot" data-position="center left"></div>
+                                        <div class="position-dot active" data-position="center center"></div>
+                                        <div class="position-dot" data-position="center right"></div>
+                                        <div class="position-dot" data-position="bottom left"></div>
+                                        <div class="position-dot" data-position="bottom center"></div>
+                                        <div class="position-dot" data-position="bottom right"></div>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <label style="font-size: 14px;">{% trans "Opacidad" %}:</label>
+                                    <input type="range" id="backgroundOpacity" min="0.1" max="1" step="0.1" value="1" style="width: 80px;">
+                                    <span id="opacityValue">100%</span>
+                                </div>
+                            </div>
+                            
+                            <input type="file" id="backgroundImageInput" accept="image/*" style="display: none;">
+                        </div>
+                    </details>
                 </div>
             </div>
         </div>
@@ -343,6 +668,7 @@
     </form>
     <div id="status" class="hint" style="margin-top:12px;"></div>
 </div>
+</main>
 
 <div id="toaster"></div>
 
@@ -367,6 +693,119 @@ const toaster = document.getElementById('toaster');
 const progressBar = document.getElementById('progressBar');
 const progressFill = document.getElementById('progressFill');
 
+// Accessibility live region for screen readers
+const statusRegion = document.getElementById('status');
+if (statusRegion) {
+    statusRegion.setAttribute('role', 'status');
+    statusRegion.setAttribute('aria-live', 'polite');
+}
+function showStatus(msg) { if (statusRegion) statusRegion.textContent = msg; }
+
+// Elementos de configuración avanzada
+const aiModelSelect = document.getElementById('aiModel');
+const qualitySelect = document.getElementById('quality');
+const smoothEdgesCheck = document.getElementById('smoothEdges');
+const featherEdgesCheck = document.getElementById('featherEdges');
+const edgeRadiusSlider = document.getElementById('edgeRadius');
+const edgeRadiusValue = document.getElementById('edgeRadiusValue');
+const sizeValue = document.getElementById('sizeValue');
+
+// Actualizar valores en tiempo real
+sizeInput.addEventListener('input', () => {
+    sizeValue.textContent = sizeInput.value;
+});
+
+edgeRadiusSlider.addEventListener('input', () => {
+    edgeRadiusValue.textContent = edgeRadiusSlider.value;
+});
+
+// Paste support: allow users to paste images from clipboard
+window.addEventListener('paste', (ev) => {
+    const clipboard = (ev.clipboardData || window.clipboardData);
+    if (!clipboard) return;
+    const items = clipboard.items || [];
+    for (let i=0;i<items.length;i++){
+        const it = items[i];
+        if (it.kind === 'file' && it.type.indexOf('image') === 0) {
+            const file = it.getAsFile();
+            if (file) {
+                const dt = new DataTransfer(); dt.items.add(file);
+                fileInput.files = dt.files;
+                fileInput.dispatchEvent(new Event('change'));
+                showStatus('{% trans "Imagen pegada desde el portapapeles" %}');
+                showToaster('{% trans "Imagen pegada desde el portapapeles" %}', '#22c55e');
+            }
+            ev.preventDefault();
+            return;
+        }
+    }
+});
+
+// Validación de archivos mejorada
+function validateFile(file) {
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/bmp'];
+    
+    if (file.size > maxSize) {
+        showToaster('{% trans "Archivo demasiado grande. Máximo 10MB." %}', '#ef4444');
+        showStatus('{% trans "Error: Archivo demasiado grande" %}');
+        return false;
+    }
+    
+    if (!allowedTypes.includes(file.type)) {
+        showToaster('{% trans "Formato no soportado. Use JPG, PNG, WebP o BMP." %}', '#ef4444');
+        showStatus('{% trans "Error: Formato no soportado" %}');
+        return false;
+    }
+    
+    return true;
+}
+
+// Keyboard navigation para swatches y presets
+function setupKeyboardNavigation() {
+    document.querySelectorAll('.swatch, .bg-preset').forEach(el => {
+        el.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                ev.preventDefault();
+                el.click();
+            }
+        });
+    });
+}
+
+// Indicador de procesamiento mejorado
+function createProcessingIndicator() {
+    const indicator = document.createElement('div');
+    indicator.className = 'processing-indicator';
+    indicator.innerHTML = `
+        <div style="display: flex; align-items: center;">
+            <div class="loading-spinner"></div>
+            <span id="processing-text">{% trans "Procesando imagen..." %}</span>
+        </div>
+        <div style="font-size: 14px; opacity: 0.8; margin-top: 4px;" id="processing-detail"></div>
+    `;
+    return indicator;
+}
+
+let processingIndicator = null;
+
+function showProcessingIndicator(text = '{% trans "Procesando imagen..." %}', detail = '') {
+    if (!processingIndicator) {
+        processingIndicator = createProcessingIndicator();
+        document.querySelector('.canvas-wrap').appendChild(processingIndicator);
+    }
+    
+    document.getElementById('processing-text').textContent = text;
+    document.getElementById('processing-detail').textContent = detail;
+    processingIndicator.style.display = 'block';
+}
+
+function hideProcessingIndicator() {
+    if (processingIndicator) {
+        processingIndicator.style.display = 'none';
+    }
+}
+
 let currentBgColor = "#ffffff";
 let brush = 'keep';
 let drawing = false;
@@ -379,10 +818,26 @@ let maskHistory = [];
 const drawLayer = document.createElement('canvas');
 const drawCtx = drawLayer.getContext('2d');
 
-// Mostrar nombre de archivo subido
+// Mostrar nombre de archivo subido con validación
 fileInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
-    fileNameSpan.textContent = file ? file.name : '';
+    if (!file) {
+        fileNameSpan.textContent = '';
+        return;
+    }
+    
+    if (!validateFile(file)) {
+        fileInput.value = ''; // Limpiar input si es inválido
+        fileNameSpan.textContent = '';
+        return;
+    }
+    
+    fileNameSpan.textContent = file.name;
+    
+    // Mostrar información del archivo
+    const sizeKB = Math.round(file.size / 1024);
+    const sizeText = sizeKB > 1024 ? `${(sizeKB/1024).toFixed(1)}MB` : `${sizeKB}KB`;
+    showStatus(`{% trans "Archivo cargado" %}: ${file.name} (${sizeText})`);
 });
 
 // Fondo preestablecido y personalizado
@@ -413,27 +868,62 @@ uploadBtnWrap.addEventListener('drop', e => {
     }
 });
 
-// Carga imagen y procesamiento automático
+// Carga imagen y procesamiento automático mejorado
 fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file || !validateFile(file)) return;
+    
     showCurtain();
     showProgressBar();
+    showProcessingIndicator('{% trans "Cargando imagen..." %}', `${file.name}`);
+    
     const reader = new FileReader();
     reader.onload = function(ev) {
         const img = new Image();
         img.onload = function() {
+            // Validar dimensiones
+            if (img.width > 3072 || img.height > 3072) {
+                hideCurtain();
+                hideProcessingIndicator();
+                showToaster('{% trans "Imagen demasiado grande. Máximo 3072x3072 píxeles." %}', "#ef4444");
+                showStatus('{% trans "Error: Imagen demasiado grande" %}');
+                return;
+            }
+            
+            if (img.width < 8 || img.height < 8) {
+                hideCurtain();
+                hideProcessingIndicator();
+                showToaster('{% trans "Imagen demasiado pequeña. Mínimo 8x8 píxeles." %}', "#ef4444");
+                showStatus('{% trans "Error: Imagen demasiado pequeña" %}');
+                return;
+            }
+            
             imgBitmap = img;
             originalImg = img;
             setCanvasSize(img.width, img.height);
             render();
             uploadBtnWrap.style.display = 'none';
-            showToaster('Procesando imagen automáticamente...');
+            
+            showProcessingIndicator('{% trans "Procesando imagen automáticamente..." %}', `${img.width}x${img.height} píxeles`);
+            showStatus('{% trans "Procesando imagen automáticamente..." %}');
+            
             setTimeout(() => {
                 processBtn.click();
             }, 100);
         };
+        img.onerror = function() {
+            hideCurtain();
+            hideProcessingIndicator();
+            showToaster('{% trans "Error al cargar la imagen" %}', "#ef4444");
+            showStatus('{% trans "Error: No se pudo cargar la imagen" %}');
+        };
         img.src = ev.target.result;
+    };
+    reader.onerror = function() {
+        hideCurtain();
+        hideProcessingIndicator();
+        showToaster('{% trans "Error al leer el archivo" %}', "#ef4444");
+        showStatus('{% trans "Error: No se pudo leer el archivo" %}');
     };
     reader.readAsDataURL(file);
 });
@@ -497,18 +987,76 @@ canvas.addEventListener('touchmove', (e) => { if (!drawing) return; const p = ge
 
 document.querySelectorAll('.swatch').forEach(el => {
     el.addEventListener('click', () => {
-        document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+        document.querySelectorAll('.swatch').forEach(s => {
+            s.classList.remove('selected');
+            s.setAttribute('aria-pressed', 'false');
+        });
         el.classList.add('selected');
+        el.setAttribute('aria-pressed', 'true');
         brush = el.dataset.color;
+        
+        // Feedback visual
+        showStatus(`{% trans "Pincel seleccionado" %}: ${brush === 'keep' ? '{% trans "Conservar" %}' : '{% trans "Quitar fondo" %}'}`);
     });
 });
 
+// Fondo preestablecido y personalizado con navegación por teclado
+document.querySelectorAll('.bg-preset').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.bg-preset').forEach(b => {
+            b.classList.remove('selected');
+            b.setAttribute('aria-pressed', 'false');
+        });
+        btn.classList.add('selected');
+        btn.setAttribute('aria-pressed', 'true');
+    currentBgColor = btn.dataset.color;
+    currentBackgroundType = 'solid';
+    backgroundSelected = true;
+        bgColorInput.value = currentBgColor === "transparent" ? "#ffffff" : currentBgColor;
+        
+        // Limpiar selección de fondos con imagen
+        if (backgroundGallery) {
+            backgroundGallery.querySelectorAll('.bg-image-preset').forEach(el => {
+                if (el !== uploadBackgroundSlot) el.classList.remove('selected');
+            });
+        }
+        
+        if (lastResultImg) drawResultOnCanvas(lastResultDataUrl);
+        
+        // Feedback
+        const colorName = btn.title || btn.dataset.color;
+        showStatus(`{% trans "Fondo seleccionado" %}: ${colorName}`);
+    });
+});
+
+bgColorInput.addEventListener('input', function() {
+    currentBgColor = bgColorInput.value;
+    currentBackgroundType = 'solid';
+    backgroundSelected = true;
+    document.querySelectorAll('.bg-preset').forEach(b => {
+        b.classList.remove('selected');
+        b.setAttribute('aria-pressed', 'false');
+    });
+    
+    // Limpiar selección de fondos con imagen
+    if (backgroundGallery) {
+        backgroundGallery.querySelectorAll('.bg-image-preset').forEach(el => {
+            if (el !== uploadBackgroundSlot) el.classList.remove('selected');
+        });
+    }
+    
+    if (lastResultImg) drawResultOnCanvas(lastResultDataUrl);
+    showStatus(`{% trans "Color de fondo personalizado" %}: ${currentBgColor}`);
+});
+
 clearBtn.addEventListener('click', () => {
-    if (confirm("¿Seguro que quieres limpiar la máscara?")) {
+    if (confirm('{% trans "¿Seguro que quieres limpiar la máscara?" %}')) {
         drawCtx.clearRect(0, 0, drawLayer.width, drawLayer.height);
         dirty = false;
         maskHistory = [];
         render();
+        showStatus('{% trans "Máscara limpiada" %}');
+        showToaster('{% trans "Máscara limpiada" %}', '#22c55e');
     }
 });
 
@@ -516,13 +1064,121 @@ undoBtn.addEventListener('click', () => {
     if (maskHistory.length) {
         drawCtx.putImageData(maskHistory.pop(), 0, 0);
         render();
+        showStatus(`{% trans "Deshacer aplicado" %}. {% trans "Pasos restantes" %}: ${maskHistory.length}`);
+        showToaster('{% trans "Trazo deshecho" %}', '#22c55e');
+    } else {
+        showStatus('{% trans "No hay acciones para deshacer" %}');
+        showToaster('{% trans "No hay acciones para deshacer" %}', '#f59e0b');
     }
 });
 
-// Atajos de teclado
+// Setup keyboard navigation
+setupKeyboardNavigation();
+
+// Atajos de teclado mejorados
 document.addEventListener('keydown', e => {
-    if (e.ctrlKey && e.key === 'z') { undoBtn.click(); }
-    if (e.ctrlKey && e.key === 'l') { clearBtn.click(); }
+    // Solo aplicar atajos cuando no hay inputs enfocados
+    if (document.activeElement.tagName === 'INPUT' || 
+        document.activeElement.tagName === 'SELECT' || 
+        document.activeElement.tagName === 'TEXTAREA') {
+        return;
+    }
+    
+    if (e.ctrlKey || e.metaKey) {
+        switch(e.key) {
+            case 'z':
+                e.preventDefault();
+                undoBtn.click();
+                break;
+            case 'l':
+                e.preventDefault();
+                clearBtn.click();
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (!processBtn.disabled) processBtn.click();
+                break;
+            case 's':
+                e.preventDefault();
+                if (!downloadBtn.disabled) downloadBtn.click();
+                break;
+        }
+    } else {
+        switch(e.key) {
+            case '1':
+                document.querySelector('.swatch[data-color="keep"]').click();
+                break;
+            case '2':
+                document.querySelector('.swatch[data-color="remove"]').click();
+                break;
+            case 'Escape':
+                if (drawing) {
+                    drawing = false;
+                    showToaster('{% trans "Dibujo cancelado" %}', '#f59e0b');
+                }
+                break;
+        }
+    }
+});
+
+// Tooltip helper para mostrar atajos
+function addKeyboardTooltips() {
+    const tooltips = {
+        'undoBtn': 'Ctrl+Z',
+        'clearBtn': 'Ctrl+L',
+        'processBtn': 'Ctrl+Enter',
+        'downloadBtn': 'Ctrl+S'
+    };
+    
+    Object.entries(tooltips).forEach(([id, shortcut]) => {
+        const el = document.getElementById(id);
+        if (el) {
+            const originalTitle = el.title;
+            el.title = `${originalTitle} (${shortcut})`;
+        }
+    });
+}
+
+// Inicializar tooltips y funcionalidades
+document.addEventListener('DOMContentLoaded', () => {
+    addKeyboardTooltips();
+    setupKeyboardNavigation();
+    
+    // Mostrar ayuda inicial
+    showStatus('{% trans "Arrastra una imagen aquí, pégala con Ctrl+V, o haz clic para seleccionar" %}');
+});
+
+// Mejorar el drag and drop con feedback visual
+uploadBtnWrap.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    uploadBtnWrap.classList.add('drag-over');
+    uploadBtnWrap.style.background = "#dbeafe";
+    uploadBtnWrap.style.transform = "scale(1.02)";
+});
+
+uploadBtnWrap.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    if (!uploadBtnWrap.contains(e.relatedTarget)) {
+        uploadBtnWrap.classList.remove('drag-over');
+        uploadBtnWrap.style.background = "";
+        uploadBtnWrap.style.transform = "";
+    }
+});
+
+uploadBtnWrap.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadBtnWrap.classList.remove('drag-over');
+    uploadBtnWrap.style.background = "";
+    uploadBtnWrap.style.transform = "";
+    
+    if (e.dataTransfer.files.length) {
+        const file = e.dataTransfer.files[0];
+        if (validateFile(file)) {
+            fileInput.files = e.dataTransfer.files;
+            fileInput.dispatchEvent(new Event('change'));
+            showToaster('{% trans "Archivo cargado correctamente" %}', '#22c55e');
+        }
+    }
 });
 
 // Cortina y barra de progreso
@@ -556,11 +1212,32 @@ function hideProgressBar() {
     progressFill.style.width = "0";
 }
 
-// Procesar imagen
+// Procesar imagen con configuración completa
 processBtn.addEventListener('click', () => {
-    if (!imgBitmap) return;
+    if (!imgBitmap) {
+        showToaster('{% trans "Primero selecciona una imagen" %}', '#ef4444');
+        showStatus('{% trans "Error: No hay imagen para procesar" %}');
+        return;
+    }
+    
     showCurtain();
     showProgressBar();
+    
+    const aiModel = aiModelSelect.value;
+    const quality = qualitySelect.value;
+    
+    // Mostrar información del procesamiento
+    let processingText = '{% trans "Procesando imagen" %}...';
+    let modelName = aiModel === 'u2netp' ? 'CroPix Lite' : 
+                   aiModel === 'u2net' ? 'CroPix Full' : 
+                   '{% trans "Silueta" %}';
+    let qualityName = quality === 'fast' ? '{% trans "Rápida" %}' : 
+                     quality === 'high' ? '{% trans "Alta" %}' : 
+                     '{% trans "Equilibrada" %}';
+    
+    showProcessingIndicator(processingText, `${modelName} - ${qualityName}`);
+    showStatus(`{% trans "Procesando con" %} ${modelName} (${qualityName})`);
+    
     let maskData = '';
     if (dirty) {
         maskData = drawLayer.toDataURL('image/png');
@@ -574,6 +1251,16 @@ function processImage(file, maskData) {
     fd.append('image', file);
     if (maskData) fd.append('mask_data', maskData);
     fd.append('mode', 'keep_subject');
+    
+    // Configuraciones avanzadas del backend
+    fd.append('ai_model', aiModelSelect.value);
+    fd.append('quality', qualitySelect.value);
+    fd.append('smooth_edges', smoothEdgesCheck.checked ? 'true' : 'false');
+    fd.append('feather_edges', featherEdgesCheck.checked ? 'true' : 'false');
+    fd.append('edge_radius', edgeRadiusSlider.value);
+    
+    const startTime = Date.now();
+    
     fetch('/api/remove/', {
         method: 'POST',
         headers: {
@@ -583,23 +1270,48 @@ function processImage(file, maskData) {
     })
     .then(resp => resp.json())
     .then( data => {
+        const processingTime = Date.now() - startTime;
         hideCurtain();
+        hideProcessingIndicator();
+        
         if(!data.success){
-            showToaster('Error: ' + (data.error || 'desconocido'), "#ef4444");
+            const errorMsg = data.error || '{% trans "Error desconocido" %}';
+            showToaster(`{% trans "Error" %}: ${errorMsg}`, "#ef4444");
+            showStatus(`{% trans "Error en procesamiento" %}: ${errorMsg}`);
             downloadBtn.disabled = true;
             render();
         } else {
             lastResultDataUrl = data.image_data;
             drawResultOnCanvas(data.image_data);
+            // Actualizar enlace a Canva con la imagen procesada
+            if (typeof updateCanvaLink === 'function') updateCanvaLink();
             downloadBtn.disabled = false;
-            showToaster('Procesamiento exitoso');
+            
+            const timeText = processingTime > 1000 ? 
+                `${(processingTime/1000).toFixed(1)}s` : 
+                `${processingTime}ms`;
+            
+            showToaster('{% trans "¡Procesamiento exitoso!" %}', '#22c55e');
+            showStatus(`{% trans "Procesamiento completado en" %} ${timeText}. ${data.result_size.width}x${data.result_size.height} píxeles`);
+            
+            // Log para debug (opcional)
+            console.log('Processing completed:', {
+                time: timeText,
+                settings: data.settings_used,
+                originalSize: data.original_size,
+                resultSize: data.result_size
+            });
         }
     })
-    .catch(() => {
+    .catch((error) => {
         hideCurtain();
-        showToaster('Error de red.', "#ef4444");
+        hideProcessingIndicator();
+        const msg = '{% trans "Error de conexión. Verifica tu internet." %}';
+        showToaster(msg, "#ef4444");
+        showStatus(msg);
         downloadBtn.disabled = true;
         render();
+        console.error('Processing error:', error);
     });
 }
 
@@ -611,11 +1323,18 @@ function drawResultOnCanvas(dataURL){
         canvas.width = w;
         canvas.height = h;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (currentBgColor !== "transparent") {
-            ctx.fillStyle = currentBgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Usar sistema unificado de fondos
+        if (currentBackgroundType === 'solid') {
+            if (currentBgColor !== "transparent") {
+                ctx.fillStyle = currentBgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            ctx.drawImage(img, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+        } else {
+            // Usar sistema de fondos con imagen
+            drawResultWithBackground();
         }
-        ctx.drawImage(img, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
     };
     img.src = dataURL;
 }
@@ -633,30 +1352,148 @@ downloadBtn.addEventListener('click', () => {
     exportCanvas.height = h;
     const exportCtx = exportCanvas.getContext('2d');
     exportCtx.clearRect(0, 0, w, h);
-    if (currentBgColor !== "transparent") {
-        exportCtx.fillStyle = currentBgColor;
-        exportCtx.fillRect(0, 0, w, h);
-    }
-    exportCtx.drawImage(lastResultImg, 0, 0, w, h);
 
-    if (format === 'png') {
-        exportCanvas.toBlob(function(blob) {
+    // Helper para emitir el archivo final
+    function emitExport() {
+        if (format === 'png') {
+            exportCanvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                downloadBlob(url, `imagen-procesada-${scale}x.png`);
+            }, 'image/png');
+        } else if (format === 'webp') {
+            exportCanvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                downloadBlob(url, `imagen-procesada-${scale}x.webp`);
+            }, 'image/webp');
+        } else if (format === 'svg') {
+            const dataURL = exportCanvas.toDataURL('image/png');
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">` +
+                        `<image href="${dataURL}" width="${w}" height="${h}"/></svg>`;
+            const blob = new Blob([svg], {type: 'image/svg+xml'});
             const url = URL.createObjectURL(blob);
-            downloadBlob(url, `imagen-procesada-${scale}x.png`);
-        }, 'image/png');
-    } else if (format === 'webp') {
-        exportCanvas.toBlob(function(blob) {
-            const url = URL.createObjectURL(blob);
-            downloadBlob(url, `imagen-procesada-${scale}x.webp`);
-        }, 'image/webp');
-    } else if (format === 'svg') {
-        const dataURL = exportCanvas.toDataURL('image/png');
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-            <image href="${dataURL}" width="${w}" height="${h}"/>
-        </svg>`;
-        const blob = new Blob([svg], {type: 'image/svg+xml'});
-        const url = URL.createObjectURL(blob);
-        downloadBlob(url, `imagen-procesada-${scale}x.svg`);
+            downloadBlob(url, `imagen-procesada-${scale}x.svg`);
+        }
+    }
+
+    // Si el usuario NO seleccionó ningún fondo explícitamente, exportamos con transparencia
+    if (!backgroundSelected) {
+        exportCtx.drawImage(lastResultImg, 0, 0, w, h);
+        emitExport();
+        return;
+    }
+
+    // Dibujar fondo según tipo seleccionado
+    if (currentBackgroundType === 'solid') {
+        if (currentBgColor !== "transparent") {
+            exportCtx.fillStyle = currentBgColor;
+            exportCtx.fillRect(0, 0, w, h);
+        }
+        exportCtx.drawImage(lastResultImg, 0, 0, w, h);
+        emitExport();
+    } else if (currentBackgroundType === 'image' && currentBackgroundImage) {
+        const bgImg = new Image();
+        bgImg.crossOrigin = 'anonymous';
+        bgImg.onload = () => {
+            exportCtx.save();
+            exportCtx.globalAlpha = backgroundOpacity || 1;
+
+            let drawX = 0, drawY = 0, drawW = w, drawH = h;
+            switch (backgroundScale) {
+                case 'cover': {
+                    const scaleX = w / bgImg.width;
+                    const scaleY = h / bgImg.height;
+                    const scale = Math.max(scaleX, scaleY);
+                    drawW = bgImg.width * scale; drawH = bgImg.height * scale;
+                } break;
+                case 'contain': {
+                    const scaleX2 = w / bgImg.width; const scaleY2 = h / bgImg.height;
+                    const scale2 = Math.min(scaleX2, scaleY2);
+                    drawW = bgImg.width * scale2; drawH = bgImg.height * scale2;
+                } break;
+                case 'fill': break;
+                case 'repeat': {
+                    const pattern = exportCtx.createPattern(bgImg, 'repeat');
+                    exportCtx.fillStyle = pattern;
+                    exportCtx.fillRect(0, 0, w, h);
+                    exportCtx.restore();
+                    exportCtx.drawImage(lastResultImg, 0, 0, w, h);
+                    emitExport();
+                    return;
+                }
+            }
+
+            if (backgroundScale !== 'fill') {
+                const [vAlign, hAlign] = (backgroundPosition || 'center center').split(' ');
+                switch (hAlign) { case 'left': drawX = 0; break; case 'right': drawX = w - drawW; break; default: drawX = (w - drawW)/2; }
+                switch (vAlign) { case 'top': drawY = 0; break; case 'bottom': drawY = h - drawH; break; default: drawY = (h - drawH)/2; }
+            }
+
+            exportCtx.drawImage(bgImg, drawX, drawY, drawW, drawH);
+            exportCtx.restore();
+            exportCtx.drawImage(lastResultImg, 0, 0, w, h);
+            emitExport();
+        };
+        bgImg.onerror = () => {
+            // Fallback: draw transparent background and the image
+            exportCtx.fillStyle = '#f8fafc'; exportCtx.fillRect(0,0,w,h);
+            exportCtx.drawImage(lastResultImg, 0, 0, w, h);
+            emitExport();
+        };
+        bgImg.src = currentBackgroundImage;
+    } else if ((currentBackgroundType === 'gradient' || currentBackgroundType === 'pattern') && currentBackgroundImage) {
+        // Use same strategy as preview: gradients via SVG, patterns via canvas tiles
+        if (currentBackgroundType === 'gradient' && currentBackgroundImage.includes('linear-gradient')) {
+            try {
+                // build SVG like in preview
+                const angleMatch = currentBackgroundImage.match(/([0-9]+)deg/);
+                const angle = angleMatch ? parseFloat(angleMatch[1]) : 180;
+                const colorStops = [];
+                const stopRe = /(#(?:[0-9a-fA-F]{3,6})|rgba?\([^\)]+\))\s*([0-9]{1,3}%?)?/g;
+                let sm;
+                while ((sm = stopRe.exec(currentBackgroundImage)) !== null) {
+                    const col = sm[1]; const pct = sm[2] || '';
+                    colorStops.push({ color: col, stop: pct });
+                }
+                if (!colorStops.length) {
+                    const re = /#([0-9a-fA-F]{3,6})/g; let out=[]; let m;
+                    while ((m = re.exec(currentBackgroundImage)) !== null) out.push('#'+m[1]);
+                    if (out.length>=2) { colorStops.push({color:out[0],stop:'0%'}); colorStops.push({color:out[1],stop:'100%'}); }
+                    else if (out.length===1) { colorStops.push({color:out[0],stop:'0%'}); colorStops.push({color:out[0],stop:'100%'}); }
+                }
+
+                const id = 'exp' + Date.now();
+                const stopsSvg = colorStops.map((s,i)=>{ const offset = s.stop && s.stop.toString().includes('%')?s.stop:(i===0?'0%':(i===colorStops.length-1?'100%':((i/(colorStops.length-1))*100+'%'))); const colorEsc = s.color.replace(/"/g,''); return `<stop offset="${offset}" stop-color="${colorEsc}" />`; }).join('');
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">`+
+                            `<defs><linearGradient id="${id}" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(${angle})">${stopsSvg}</linearGradient></defs>`+
+                            `<rect width="100%" height="100%" fill="url(#${id})" /></svg>`;
+                const svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+                const gimg = new Image();
+                gimg.onload = () => { exportCtx.drawImage(gimg,0,0,w,h); exportCtx.drawImage(lastResultImg,0,0,w,h); emitExport(); };
+                gimg.onerror = () => { exportCtx.fillStyle = colorStops.length?colorStops[0].color:'#f8fafc'; exportCtx.fillRect(0,0,w,h); exportCtx.drawImage(lastResultImg,0,0,w,h); emitExport(); };
+                gimg.src = svgUrl;
+            } catch (err) { console.error('Export gradient error',err); exportCtx.fillStyle='#f8fafc'; exportCtx.fillRect(0,0,w,h); exportCtx.drawImage(lastResultImg,0,0,w,h); emitExport(); }
+        } else {
+            // pattern fallback: draw simple tile
+            try {
+                if (currentBackgroundImage.includes('repeating-linear-gradient')) {
+                    const re = /#([0-9a-fA-F]{3,6})/g; let out=[]; let m;
+                    while ((m = re.exec(currentBackgroundImage)) !== null) out.push('#'+m[1]);
+                    const c1 = out[0]||'#f8f9fa'; const c2 = out[1]||'#e9ecef';
+                    const tile = document.createElement('canvas'); tile.width=40; tile.height=40; const tctx = tile.getContext('2d');
+                    tctx.fillStyle=c1; tctx.fillRect(0,0,40,40); tctx.fillStyle=c2; tctx.fillRect(0,0,40,20);
+                    const pattern = exportCtx.createPattern(tile,'repeat'); exportCtx.fillStyle = pattern; exportCtx.fillRect(0,0,w,h);
+                } else {
+                    exportCtx.fillStyle = '#f8fafc'; exportCtx.fillRect(0,0,w,h);
+                }
+            } catch(e){ exportCtx.fillStyle='#f8fafc'; exportCtx.fillRect(0,0,w,h); }
+            exportCtx.drawImage(lastResultImg,0,0,w,h); emitExport();
+        }
+    } else {
+        // Fallback genérico
+        exportCtx.fillStyle = currentBgColor !== 'transparent' ? currentBgColor : '#f8fafc';
+        exportCtx.fillRect(0,0,w,h);
+        exportCtx.drawImage(lastResultImg,0,0,w,h);
+        emitExport();
     }
 });
 
@@ -669,5 +1506,511 @@ function downloadBlob(url, filename) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     document.body.removeChild(a);
 }
+
+// === FUNCIONALIDAD DE FONDOS CON IMAGEN ===
+let currentBackgroundImage = null;
+let currentBackgroundType = 'solid';
+// Indica si el usuario seleccionó explícitamente un fondo (solid/image/gradient/pattern)
+let backgroundSelected = false;
+let backgroundScale = 'cover';
+let backgroundPosition = 'center center';
+let backgroundOpacity = 1;
+
+// Token para invalidar dibujados asíncronos antiguos (evita que un onload previo sobreescriba)
+let bgDrawToken = 0;
+
+// Variables para almacenar imágenes de fondo subidas
+const uploadedBackgrounds = [];
+
+// Input de archivo para fondos
+const backgroundImageInput = document.getElementById('backgroundImageInput');
+const uploadBackgroundSlot = document.getElementById('uploadBackgroundSlot');
+const backgroundGallery = document.getElementById('backgroundGallery');
+const backgroundScaleSelect = document.getElementById('backgroundScale');
+const positionGrid = document.getElementById('positionGrid');
+const backgroundOpacitySlider = document.getElementById('backgroundOpacity');
+const opacityValue = document.getElementById('opacityValue');
+
+// Manejar clic en slot de subida
+uploadBackgroundSlot.addEventListener('click', () => {
+    backgroundImageInput.click();
+});
+
+// Manejar subida de archivo
+backgroundImageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (!validateFile(file)) return;
+    
+    showProcessingIndicator('{% trans "Cargando imagen de fondo..." %}');
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+            // Crear thumbnail para la galería
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 80;
+            canvas.height = 80;
+            
+            // Calcular escalado para mantener aspecto
+            const scale = Math.min(80 / img.width, 80 / img.height);
+            const width = img.width * scale;
+            const height = img.height * scale;
+            const x = (80 - width) / 2;
+            const y = (80 - height) / 2;
+            
+            ctx.clearRect(0, 0, 80, 80);
+            ctx.drawImage(img, x, y, width, height);
+            
+            const thumbnailDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Agregar a la lista de fondos subidos
+            const backgroundData = {
+                original: event.target.result,
+                thumbnail: thumbnailDataUrl,
+                name: file.name
+            };
+            uploadedBackgrounds.push(backgroundData);
+            
+            // Crear elemento en la galería
+            const bgElement = document.createElement('div');
+            bgElement.className = 'bg-image-preset';
+            bgElement.style.backgroundImage = `url(${thumbnailDataUrl})`;
+            bgElement.style.backgroundSize = 'cover';
+            bgElement.style.backgroundPosition = 'center';
+            bgElement.title = file.name;
+            bgElement.dataset.bgType = 'uploaded';
+            bgElement.dataset.bgIndex = uploadedBackgrounds.length - 1;
+            
+            // Insertar antes del slot de subida
+            backgroundGallery.insertBefore(bgElement, uploadBackgroundSlot);
+            
+            // Auto-seleccionar la nueva imagen
+            selectBackgroundImage(bgElement, backgroundData.original);
+            
+            hideProcessingIndicator();
+            showToaster('{% trans "Imagen de fondo cargada exitosamente" %}', '#22c55e');
+        };
+        img.onerror = () => {
+            hideProcessingIndicator();
+            showToaster('{% trans "Error al cargar la imagen de fondo" %}', '#ef4444');
+        };
+        img.src = event.target.result;
+    };
+    
+    reader.onerror = () => {
+        hideProcessingIndicator();
+        showToaster('{% trans "Error al leer el archivo" %}', '#ef4444');
+    };
+    
+    reader.readAsDataURL(file);
+});
+
+// Manejar selección de fondos predeterminados y subidos
+backgroundGallery.addEventListener('click', (e) => {
+    const target = e.target.closest('.bg-image-preset');
+    if (!target || target === uploadBackgroundSlot) return;
+    
+    // Limpiar selección de fondos sólidos
+    document.querySelectorAll('.bg-preset').forEach(b => {
+        b.classList.remove('selected');
+        b.setAttribute('aria-pressed', 'false');
+    });
+    
+    // Remover selección anterior de fondos con imagen
+    backgroundGallery.querySelectorAll('.bg-image-preset').forEach(el => {
+        if (el !== uploadBackgroundSlot) el.classList.remove('selected');
+    });
+
+    // Seleccionar nuevo fondo
+    target.classList.add('selected');
+    
+    if (target.dataset.bgType === 'uploaded') {
+        const index = parseInt(target.dataset.bgIndex);
+        const backgroundData = uploadedBackgrounds[index];
+        selectBackgroundImage(target, backgroundData.original);
+    } else if (target.dataset.bgType === 'image') {
+        // Imagen precargada: preferir data-bg-src si está disponible
+        let src = target.dataset.bgSrc;
+        if (!src) {
+            // intentar extraer de computedStyle background-image
+            const cs = window.getComputedStyle(target);
+            const bg = cs.backgroundImage || cs.background || '';
+            const m = bg.match(/url\((?:"|')?(.*?)(?:"|')?\)/);
+            if (m) src = m[1];
+        }
+        if (src) selectBackgroundImage(target, src);
+    } else if (target.dataset.bgType === 'gradient') {
+        selectBackgroundGradient(target);
+    } else if (target.dataset.bgType === 'pattern') {
+        selectBackgroundPattern(target);
+    }
+});
+function selectBackgroundImage(element, imageUrl) {
+    currentBackgroundImage = imageUrl;
+    currentBackgroundType = 'image';
+    backgroundSelected = true;
+    bgDrawToken++;
+    
+    // Aplicar fondo si hay resultado
+    if (lastResultImg) {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+    
+    showStatus('{% trans "Fondo de imagen aplicado" %}');
+}
+
+function selectBackgroundGradient(element) {
+    const gradientStyle = element.style.background;
+    currentBackgroundImage = gradientStyle;
+    currentBackgroundType = 'gradient';
+    backgroundSelected = true;
+    bgDrawToken++;
+    
+    if (lastResultImg) {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+    
+    showStatus('{% trans "Fondo degradado aplicado" %}');
+}
+
+function selectBackgroundPattern(element) {
+    const patternStyle = element.style.background;
+    currentBackgroundImage = patternStyle;
+    currentBackgroundType = 'pattern';
+    backgroundSelected = true;
+    bgDrawToken++;
+    
+    if (lastResultImg) {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+    
+    showStatus('{% trans "Fondo de patrón aplicado" %}');
+}
+
+// Controles de escala
+backgroundScaleSelect.addEventListener('change', (e) => {
+    backgroundScale = e.target.value;
+    if (lastResultImg && currentBackgroundType !== 'solid') {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+});
+
+// Controles de posición
+positionGrid.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('position-dot')) return;
+    
+    // Remover selección anterior
+    positionGrid.querySelectorAll('.position-dot').forEach(dot => {
+        dot.classList.remove('active');
+    });
+    
+    // Seleccionar nueva posición
+    e.target.classList.add('active');
+    backgroundPosition = e.target.dataset.position;
+    
+    if (lastResultImg && currentBackgroundType !== 'solid') {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+});
+
+// Control de opacidad
+backgroundOpacitySlider.addEventListener('input', (e) => {
+    backgroundOpacity = parseFloat(e.target.value);
+    opacityValue.textContent = Math.round(backgroundOpacity * 100) + '%';
+    
+    if (lastResultImg && currentBackgroundType !== 'solid') {
+        drawResultOnCanvas(lastResultDataUrl);
+    }
+});
+
+function drawResultWithBackground() {
+    if (!lastResultImg) return;
+    
+    const w = lastResultImg.width;
+    const h = lastResultImg.height;
+    canvas.width = w;
+    canvas.height = h;
+    ctx.clearRect(0, 0, w, h);
+    
+    if (currentBackgroundType === 'image' && currentBackgroundImage) {
+        // Dibujar imagen de fondo (con token para evitar race conditions)
+        const myToken = ++bgDrawToken;
+        const bgImg = new Image();
+        bgImg.onload = () => {
+            if (myToken !== bgDrawToken) return; // stale load
+            ctx.save();
+            ctx.globalAlpha = backgroundOpacity;
+
+            let drawX = 0, drawY = 0, drawW = w, drawH = h;
+
+            switch (backgroundScale) {
+                case 'cover': {
+                    const scaleX = w / bgImg.width;
+                    const scaleY = h / bgImg.height;
+                    const scale = Math.max(scaleX, scaleY);
+                    drawW = bgImg.width * scale;
+                    drawH = bgImg.height * scale;
+                } break;
+                case 'contain': {
+                    const scaleX2 = w / bgImg.width;
+                    const scaleY2 = h / bgImg.height;
+                    const scale2 = Math.min(scaleX2, scaleY2);
+                    drawW = bgImg.width * scale2;
+                    drawH = bgImg.height * scale2;
+                } break;
+                case 'fill':
+                    // Usar tamaño completo del canvas
+                    break;
+                case 'repeat': {
+                    const pattern = ctx.createPattern(bgImg, 'repeat');
+                    ctx.fillStyle = pattern;
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.restore();
+                    ctx.drawImage(lastResultImg, 0, 0);
+                    return;
+                }
+            }
+
+            // Calcular posición
+            if (backgroundScale !== 'fill') {
+                const [vAlign, hAlign] = backgroundPosition.split(' ');
+                switch (hAlign) {
+                    case 'left': drawX = 0; break;
+                    case 'right': drawX = w - drawW; break;
+                    default: drawX = (w - drawW) / 2; break;
+                }
+                switch (vAlign) {
+                    case 'top': drawY = 0; break;
+                    case 'bottom': drawY = h - drawH; break;
+                    default: drawY = (h - drawH) / 2; break;
+                }
+            }
+
+            ctx.drawImage(bgImg, drawX, drawY, drawW, drawH);
+            ctx.restore();
+            ctx.drawImage(lastResultImg, 0, 0);
+        };
+        bgImg.src = currentBackgroundImage;
+    } else if (currentBackgroundType === 'gradient' || currentBackgroundType === 'pattern') {
+        // Para gradientes y patrones, intentar renderizar el CSS inline real.
+        ctx.save();
+        ctx.globalAlpha = backgroundOpacity;
+
+        // Helper: extrae colores hex desde la cadena CSS
+        function extractHexColors(str) {
+            const re = /#([0-9a-fA-F]{3,6})/g;
+            const out = [];
+            let m;
+            while ((m = re.exec(str)) !== null) out.push('#' + m[1]);
+            return out;
+        }
+
+        if (currentBackgroundType === 'gradient' && currentBackgroundImage && currentBackgroundImage.includes('linear-gradient')) {
+            try {
+                // Extraer ángulo (en deg) y colores
+                const angleMatch = currentBackgroundImage.match(/([0-9]+)deg/);
+                const angle = angleMatch ? parseFloat(angleMatch[1]) : 180;
+                const colorStops = [];
+                // Buscar colores con porcentaje opcional
+                const stopRe = /(#(?:[0-9a-fA-F]{3,6})|rgba?\([^\)]+\))\s*([0-9]{1,3}%?)?/g;
+                let sm;
+                while ((sm = stopRe.exec(currentBackgroundImage)) !== null) {
+                    const col = sm[1];
+                    const pct = sm[2] || '';
+                    colorStops.push({ color: col, stop: pct });
+                }
+                // Fallback: if no stops found, fallback to extracting hex colors
+                if (!colorStops.length) {
+                    const hex = extractHexColors(currentBackgroundImage);
+                    if (hex.length >= 2) {
+                        colorStops.push({ color: hex[0], stop: '0%' });
+                        colorStops.push({ color: hex[1], stop: '100%' });
+                    } else if (hex.length === 1) {
+                        colorStops.push({ color: hex[0], stop: '0%' });
+                        colorStops.push({ color: hex[0], stop: '100%' });
+                    }
+                }
+
+                // Construir SVG con linearGradient
+                const id = 'g' + Date.now();
+                const stopsSvg = colorStops.map((s, i) => {
+                    const offset = s.stop && s.stop.toString().includes('%') ? s.stop : (i === 0 ? '0%' : (i === colorStops.length - 1 ? '100%' : ((i/(colorStops.length-1))*100+'%')));
+                    // Escape ampersands just in case
+                    const colorEsc = s.color.replace(/"/g, '');
+                    return `<stop offset="${offset}" stop-color="${colorEsc}" />`;
+                }).join('');
+
+                // gradient direction via rotate transform
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">` +
+                            `<defs><linearGradient id="${id}" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(${angle})">${stopsSvg}</linearGradient></defs>` +
+                            `<rect width="100%" height="100%" fill="url(#${id})" /></svg>`;
+                const svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+                const gimg = new Image();
+                gimg.onload = () => {
+                    ctx.drawImage(gimg, 0, 0, w, h);
+                    ctx.restore();
+                    ctx.drawImage(lastResultImg, 0, 0);
+                };
+                gimg.onerror = () => {
+                    // Fallback simple
+                    ctx.fillStyle = colorStops.length ? colorStops[0].color : '#f8fafc';
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.restore();
+                    ctx.drawImage(lastResultImg, 0, 0);
+                };
+                gimg.src = svgUrl;
+                return; // async draw will happen in onload
+            } catch (err) {
+                console.error('Gradient render error', err);
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(0, 0, w, h);
+            }
+        } else if (currentBackgroundType === 'pattern' && currentBackgroundImage) {
+            // Manejo básico de patrones conocidos: stripes o dots
+            if (currentBackgroundImage.includes('repeating-linear-gradient')) {
+                // Extraer dos colores si es posible
+                const hex = extractHexColors(currentBackgroundImage);
+                const c1 = hex[0] || '#f8f9fa';
+                const c2 = hex[1] || '#e9ecef';
+                // Dibujar patrón de rayas diagonales
+                const tile = document.createElement('canvas');
+                tile.width = 40; tile.height = 40;
+                const tctx = tile.getContext('2d');
+                tctx.fillStyle = c1; tctx.fillRect(0,0,40,40);
+                tctx.fillStyle = c2; tctx.fillRect(0,0,40,20);
+                const pattern = ctx.createPattern(tile, 'repeat');
+                ctx.fillStyle = pattern;
+                ctx.fillRect(0, 0, w, h);
+            } else if (currentBackgroundImage.includes('radial-gradient') || currentBackgroundImage.includes('radial')) {
+                // Dibujar patrón de puntos simple
+                ctx.fillStyle = '#f8f9fa';
+                ctx.fillRect(0,0,w,h);
+                ctx.fillStyle = '#e9ecef';
+                const spacing = 20;
+                for (let y=spacing/2;y<h;y+=spacing) for (let x=spacing/2;x<w;x+=spacing) ctx.beginPath(), ctx.arc(x,y,2,0,Math.PI*2), ctx.fill();
+            } else {
+                // Fallback sólido
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(0,0,w,h);
+            }
+            ctx.restore();
+            ctx.drawImage(lastResultImg, 0, 0);
+            return;
+        }
+
+        // Si llegamos aquí (no async svg), dibujar fallback y la imagen
+        ctx.fillStyle = currentBgColor !== 'transparent' ? currentBgColor : '#f8fafc';
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+        ctx.drawImage(lastResultImg, 0, 0);
+    } else {
+        // Fondo sólido tradicional
+        if (currentBgColor !== "transparent") {
+            ctx.fillStyle = currentBgColor;
+            ctx.fillRect(0, 0, w, h);
+        }
+        ctx.drawImage(lastResultImg, 0, 0);
+    }
+}
+
+// Modificar la función drawResultOnCanvas existente para usar backgrounds
+const originalDrawResultOnCanvas = window.drawResultOnCanvas;
+window.drawResultOnCanvas = function(dataURL) {
+    const img = new Image();
+    img.onload = () => {
+        lastResultImg = img;
+        const w = img.width, h = img.height;
+        canvas.width = w;
+        canvas.height = h;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Usar nuevo sistema de fondos si está activo
+        if (currentBackgroundType !== 'solid') {
+            drawResultWithBackground();
+        } else {
+            // Usar fondo sólido tradicional
+            if (currentBgColor !== "transparent") {
+                ctx.fillStyle = currentBgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            ctx.drawImage(img, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
+        }
+    };
+    img.src = dataURL;
+};
+
+// Actualizar enlace de Canva para enviar la imagen procesada (si está disponible)
+function updateCanvaLink() {
+    const a = document.getElementById('canvaEditLink');
+    if (!a) return;
+    const defaultHref = a.getAttribute('data-default-href') || a.href;
+    if (lastResultDataUrl) {
+        try {
+            // Construir URL de Canva con image-url param; encodeURIComponent puede ser grande para data URLs but works for modern browsers
+            const url = new URL(defaultHref);
+            // Set or replace image-url parameter
+            url.searchParams.set('image-url', lastResultDataUrl);
+            a.href = url.toString();
+        } catch (err) {
+            // Fallback: append as param
+            a.href = defaultHref.split('?')[0] + '?image-url=' + encodeURIComponent(lastResultDataUrl);
+        }
+    } else {
+        a.href = defaultHref;
+    }
+}
+
+// Llamar al actualizar el link cuando el documento cargue y después de dibujar resultado
+document.addEventListener('DOMContentLoaded', () => updateCanvaLink());
+
+// Interceptar click en el enlace de Canva para subir la imagen procesada al servidor
+document.addEventListener('click', (ev) => {
+    const target = ev.target.closest && ev.target.closest('#canvaEditLink');
+    if (!target) return;
+    // Si no hay imagen procesada, permitir el comportamiento por defecto
+    if (!lastResultDataUrl) return;
+
+    ev.preventDefault();
+    const a = target;
+    // Mostrar indicador de procesamiento ligero
+    showProcessingIndicator('{% trans "Preparando imagen para editar en Canva..." %}');
+
+    // Subir la imagen al endpoint que guarda en MEDIA y devuelve URL pública
+    fetch('/api/upload-image/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ image_data: lastResultDataUrl }).toString()
+    }).then(r => r.json())
+    .then(json => {
+        hideProcessingIndicator();
+        if (json && json.success && json.url) {
+            // Construir URL de Canva reemplazando image-url por la nueva URL pública
+            try {
+                const url = new URL(a.getAttribute('data-default-href') || a.href);
+                url.searchParams.set('image-url', json.url);
+                window.open(url.toString(), '_blank', 'noopener');
+            } catch (err) {
+                // Fallback
+                const base = (a.getAttribute('data-default-href') || a.href).split('?')[0];
+                window.open(base + '?image-url=' + encodeURIComponent(json.url), '_blank', 'noopener');
+            }
+        } else {
+            showToaster('{% trans "No se pudo subir la imagen. Intenta descargarla y subirla manualmente a Canva." %}', '#ef4444');
+        }
+    }).catch(err => {
+        hideProcessingIndicator();
+        console.error('Upload error', err);
+        showToaster('{% trans "Error al subir la imagen a servidor." %}', '#ef4444');
+    });
+});
+
+// === FIN DE FUNCIONALIDAD DE FONDOS CON IMAGEN ===
 </script>
 {% endblock %}
