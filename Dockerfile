@@ -14,7 +14,7 @@ COPY . /app
 
 # Instala dependencias de Python
 RUN pip install --upgrade pip
-RUN pip install django rembg pillow gunicorn onnxruntime rembg[sam] django-cors-headers
+RUN pip install django rembg pillow gunicorn onnxruntime rembg[sam] django-cors-headers opencv-python
 
 
 # Ejecuta collectstatic antes de iniciar Gunicorn
